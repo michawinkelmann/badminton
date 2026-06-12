@@ -1,0 +1,531 @@
+/** Schlagtechnik — 20 Übungen. Material-Konvention siehe aufwaermen.ts. */
+import type { Uebung } from '../../datenmodell'
+
+export const schlagtechnik: Uebung[] = [
+  {
+    id: 'st-01',
+    name: 'Clear-Festigung über Zuspiel',
+    kategorie: 'schlagtechnik',
+    skills: ['clear'],
+    niveau: ['anfaenger', 'fortgeschritten'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: [],
+    kurzbeschreibung:
+      'Vorhand-Überkopf-Clear aus hohem Zuspiel — Grundlagenübung für Länge und Höhe.',
+    durchfuehrung: [
+      'Zuspieler spielt von der Feldmitte hohe Bälle ins Mitte-Hinterfeld.',
+      'Schläger spielt Vorhand-Überkopf-Clears hoch und weit Richtung gegnerische Grundlinie.',
+      'Technikpunkte: seitliche Stellung, Bogenspannung aufbauen, Ellbogen führt, Treffpunkt hoch und leicht vor dem Körper.',
+      '2 × 10 Clears, dann Rollen tauschen; insgesamt 3 Durchgänge pro Person.',
+    ],
+    variationen: [
+      'Leichter: Zuspiel aus der Hand werfen statt schlagen.',
+      'Schwerer: vor jedem Clear zurück zur Feldmitte mit Split-Step.',
+    ],
+    fehlerbilder: [
+      'Treffpunkt hinter dem Körper → früher unter den Shuttle laufen, Schulterachse eindrehen.',
+      'Clear zu flach → Schlagfläche zum Treffzeitpunkt leicht nach oben öffnen, „über die Hand" hinaus schlagen.',
+    ],
+    animationId: 'anim-clear',
+  },
+  {
+    id: 'st-02',
+    name: 'Clear-Längenkontrolle auf Zielzonen',
+    kategorie: 'schlagtechnik',
+    skills: ['clear'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Klebeband (Zielzonen)'],
+    kurzbeschreibung:
+      'Clears gezielt in die hinterste Zone spielen — wer kurz clearen muss, lernt hier Länge.',
+    durchfuehrung: [
+      'Mit Klebeband eine Zielzone markieren: letzte 60 cm vor der Grundlinie über die Feldbreite.',
+      'Zuspieler bringt hohe Bälle, Schläger spielt 15 Clears und zählt Treffer in der Zone.',
+      'Zweiter Satz: nur Clears diagonal — Längengefühl auf der langen Diagonale.',
+      'Rollen tauschen; Zielvorgabe z. B. 8 von 15.',
+    ],
+    variationen: [
+      'Leichter: Zone auf 1 m vergrößern.',
+      'Schwerer: Angriffs-Clear (flacher, schneller) in dieselbe Zone.',
+    ],
+    fehlerbilder: [
+      'Shuttle landet mittig im Feld → mehr Beschleunigung aus Unterarmrotation, Treffpunkt prüfen.',
+      'Körpergewicht bleibt hinten → bewusst mit dem Schlag nach vorn in den Lauf zurück zur Mitte gehen.',
+    ],
+    animationId: 'anim-clear',
+  },
+  {
+    id: 'st-03',
+    name: 'Drop-Präzision auf Zielfelder',
+    kategorie: 'schlagtechnik',
+    skills: ['drop'],
+    niveau: ['anfaenger', 'fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Reifen oder Klebeband (Zielfelder)'],
+    kurzbeschreibung:
+      'Überkopf-Drops aus dem Hinterfeld präzise in markierte Vorfeld-Ziele spielen.',
+    durchfuehrung: [
+      'Zwei Reifen (oder Klebebandfelder) ins gegnerische Vorfeld legen: einer nahe der Netzmitte, einer in der Vorhand-Ecke.',
+      'Zuspieler spielt hohe Bälle ins Hinterfeld, Schläger spielt Drops abwechselnd auf beide Ziele.',
+      'Wichtig: gleiche Ausholbewegung wie beim Clear (Täuschung), Tempo erst im Treffpunkt herausnehmen.',
+      '3 × 10 Drops pro Person, Treffer zählen.',
+    ],
+    variationen: [
+      'Leichter: Ziele direkt hinter die Aufschlaglinie legen, Flugkurve höher erlauben.',
+      'Schwerer: Schnitt-Drop (Slice) — Ziel bleibt, Flugzeit sinkt.',
+    ],
+    fehlerbilder: [
+      'Drop segelt zu weit ins Mittelfeld → Treffpunkt höher suchen, Handgelenk fixieren statt durchschlagen.',
+      'Ausholbewegung verrät den Drop → Zuspieler gibt Rückmeldung, ob Clear und Drop gleich aussehen.',
+    ],
+    animationId: 'anim-drop',
+  },
+  {
+    id: 'st-04',
+    name: 'Clear-Drop-Wechsel auf Ansage',
+    kategorie: 'schlagtechnik',
+    skills: ['clear', 'drop', 'taktik_einzel'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: [],
+    kurzbeschreibung:
+      'Aus identischer Ausholbewegung spät zwischen Clear und Drop entscheiden — die Basis jeder Täuschung.',
+    durchfuehrung: [
+      'Zuspieler spielt hohe Bälle ins Hinterfeld und ruft erst kurz vor dem Treffpunkt „lang" oder „kurz".',
+      'Schläger setzt die Ansage um: Clear zur Grundlinie oder Drop ins Vorfeld — mit identischem Ausholen.',
+      '4 × 8 Bälle, dann Wechsel; Pausen für kurzes Feedback nutzen.',
+    ],
+    variationen: [
+      'Leichter: Ansage schon beim Zuspiel.',
+      'Schwerer: keine Ansage — Zuspieler rückt nach vorn oder bleibt hinten, Schläger entscheidet gegenläufig.',
+    ],
+    fehlerbilder: [
+      'Bei „kurz" wird die Bewegung langsamer → Armzug gleich schnell lassen, nur Schlägerfläche bremst den Shuttle.',
+    ],
+  },
+  {
+    id: 'st-05',
+    name: 'Smash-Serien aus halbhohem Zuspiel',
+    kategorie: 'schlagtechnik',
+    skills: ['smash'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 10,
+    personen: 'paar',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Smash-Grundtechnik in kurzen Serien: steiler Winkel vor purer Härte.',
+    durchfuehrung: [
+      'Zuspieler wirft oder schlägt halbhohe Bälle ins Mitte-Hinterfeld (Multishuttle aus dem Korb).',
+      'Schläger smasht 3er-Serien, danach 20 Sekunden Pause — Qualität vor Quantität.',
+      'Technikpunkte: Treffpunkt deutlich vor dem Körper, Schlagfläche zeigt beim Treffen schräg nach unten, Handgelenk schnappt über den Shuttle.',
+      '5 Serien pro Person, dann Wechsel; 2 Durchgänge.',
+    ],
+    variationen: [
+      'Leichter: aus dem Stand smashen, Zuspiel höher.',
+      'Schwerer: vor jeder Serie ein Umsprung in der Vorhand-Ecke.',
+    ],
+    fehlerbilder: [
+      'Smash fliegt flach statt steil → Treffpunkt weiter vorn suchen; Merkbild: „über den Ball greifen".',
+      'Volle Kraft, kein Winkel → erst Platzierung auf die hintere Aufschlaglinie des Gegners, dann Tempo steigern.',
+    ],
+    animationId: 'anim-smash',
+  },
+  {
+    id: 'st-06',
+    name: 'Smash-Platzierung auf die Seitenbahnen',
+    kategorie: 'schlagtechnik',
+    skills: ['smash', 'taktik_einzel'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Klebeband (Zielbahnen)'],
+    kurzbeschreibung:
+      'Smashes bewusst an die Seitenlinien statt auf den Gegner — Platzierung schlägt Härte.',
+    durchfuehrung: [
+      'Beide Seitenbahnen des gegnerischen Felds als Zielzonen markieren (Doppel-Seitenbahn).',
+      'Zuspieler hebt hoch auf, Schläger smasht abwechselnd links/rechts in die Bahnen — mit 80 % Kraft.',
+      '3 × 10 Smashes, Treffer zählen; danach Rollen tauschen.',
+      'Abschlusswettkampf: 10 Smashes, jede getroffene Bahn 1 Punkt, Smash auf den Körper des Zuspielers 0 Punkte.',
+    ],
+    variationen: [
+      'Leichter: nur eine Seite als Ziel, Zuspiel immer in dieselbe Ecke.',
+      'Schwerer: Zuspieler verteidigt aktiv, Punkt nur bei direktem Durchkommen oder schwachem Return.',
+    ],
+    fehlerbilder: [
+      'Alle Smashes mittig → Schulterachse zeigt schon im Absprung zur Zielseite; bewusst umspringen.',
+    ],
+    animationId: 'anim-smash',
+  },
+  {
+    id: 'st-07',
+    name: 'Drive-Duell im Mittelfeld',
+    kategorie: 'schlagtechnik',
+    skills: ['drive', 'schnelligkeit'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 8,
+    personen: 'paar',
+    material: [],
+    kurzbeschreibung:
+      'Flache, schnelle Drives auf kurzer Distanz — Handgelenksschnellkraft und kurze Ausholwege.',
+    durchfuehrung: [
+      'Beide stehen auf Höhe der vorderen Aufschlaglinie, Shuttle wird flach und hart über das Netz gespielt.',
+      '3 × 1 Minute Dauerfeuer Vorhand/Rückhand im Wechsel, 30 Sekunden Pause.',
+      'Schläger vor dem Körper halten (Rückhandgriff als Grundstellung), Ausholweg maximal 30 cm.',
+      'Ziel: Ballwechsel am Leben halten, Tempo gemeinsam steigern.',
+    ],
+    variationen: [
+      'Leichter: Abstand vergrößern (beide an der T-Linie ihres Felds).',
+      'Schwerer: nur Rückhand-Drives; oder Duell auf Punkte (Bodenkontakt = Punkt).',
+    ],
+    fehlerbilder: [
+      'Große Ausholbewegung wie beim Clear → Ellbogen vorn lassen, Schlag nur aus Unterarm und Handgelenk.',
+      'Schläger hängt nach dem Schlag unten → sofort zurück in die Vorhalteposition vor der Brust.',
+    ],
+    animationId: 'anim-drive-vh',
+  },
+  {
+    id: 'st-08',
+    name: 'Kurzer Rückhand-Aufschlag auf Zielzonen',
+    kategorie: 'schlagtechnik',
+    skills: ['aufschlag'],
+    niveau: ['anfaenger', 'fortgeschritten', 'leistung'],
+    dauerMin: 10,
+    personen: 'allein',
+    material: ['Shuttle-Korb', 'Klebeband (Zielzonen)'],
+    kurzbeschreibung:
+      'Den kurzen Rückhand-Aufschlag knapp über die Netzkante in markierte Zonen an der T-Linie legen.',
+    durchfuehrung: [
+      'Zwei Zielzonen (30 × 30 cm) hinter der gegnerischen vorderen Aufschlaglinie markieren: an der Mittellinie und außen.',
+      'Aus dem Korb 3 × 15 Aufschläge: kurze Rückhand-Aufschläge, abwechselnd auf beide Zonen.',
+      'Technikpunkte: Shuttle an den Federn halten, kurzer Schub aus dem Unterarm, Schlägerkopf bleibt unter Handhöhe, Flugkurve flach über die Netzkante.',
+      'Treffer notieren und mit der letzten Einheit vergleichen.',
+    ],
+    variationen: [
+      'Leichter: Zonen vergrößern (50 × 50 cm).',
+      'Schwerer: Partner steht mit erhobenem Schläger am Netz — Aufschlag darf nicht abfangbar sein; gelegentlich überraschenden Swip (lang) einstreuen.',
+    ],
+    fehlerbilder: [
+      'Shuttle steigt hoch über das Netz → Treffpunkt weiter vorn und höher (knapp unter Taillenhöhe nach Regel), flacher schieben statt schlagen.',
+      'Aufschlag landet vor der Linie → mutiger durchschieben; Ziel ist die Linie selbst.',
+    ],
+    animationId: 'anim-aufschlag-kurz',
+  },
+  {
+    id: 'st-09',
+    name: 'Langer Vorhand-Aufschlag (Einzel)',
+    kategorie: 'schlagtechnik',
+    skills: ['aufschlag'],
+    niveau: ['anfaenger', 'fortgeschritten'],
+    dauerMin: 10,
+    personen: 'allein',
+    material: ['Shuttle-Korb', 'Klebeband (Zielzone)'],
+    kurzbeschreibung:
+      'Hoher, langer Vorhand-Aufschlag bis in die hintere Aufschlagzone — der Standard im Einzel.',
+    durchfuehrung: [
+      'Zielzone markieren: letzter Meter der Einzel-Aufschlagfläche, mittig bis rückhandseitig.',
+      '3 × 15 Aufschläge aus dem Korb, jeweils aus dem rechten und linken Aufschlagfeld.',
+      'Technikpunkte: Schrittstellung, Shuttle vor dem Körper fallen lassen, Hüfte dreht ein, Schläger schwingt von tief nach hoch durch, Shuttle fällt steil hinten herunter.',
+      'Messlatte: Shuttle muss senkrecht fallend in der Zone landen, nicht flach hineinrutschen.',
+    ],
+    variationen: [
+      'Leichter: Distanz verkürzen — Aufschlag aus dem Feldinneren, dann zurückarbeiten.',
+      'Schwerer: nach jedem Aufschlag Grundposition einnehmen, Partner spielt einen Return, der noch gespielt werden muss.',
+    ],
+    fehlerbilder: [
+      'Aufschlag zu kurz und flach → vollständiger Durchschwung bis über die linke Schulter, Treffpunkt vor dem Körper.',
+      'Shuttle aus der Drehung verrissen → Standfüße bleiben bis zum Treffpunkt am Boden (Regel!), erst dann nachdrehen.',
+    ],
+    animationId: 'anim-aufschlag-lang',
+  },
+  {
+    id: 'st-10',
+    name: 'Netzdrop aus der Bewegung',
+    kategorie: 'schlagtechnik',
+    skills: ['netzspiel', 'beinarbeit'],
+    niveau: ['anfaenger', 'fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Aus der zentralen Position ans Netz laufen und den Shuttle eng über die Kante tropfen lassen.',
+    durchfuehrung: [
+      'Schläger startet am T-Punkt, Zuspieler spielt (oder wirft) Shuttles knapp hinter das Netz, abwechselnd Vorhand- und Rückhandseite.',
+      'Laufweg: Split-Step, langer Ausfallschritt, Schlägerarm weit vorgestreckt, Treffpunkt so früh und hoch wie möglich.',
+      'Netzdrop eng an die Kante spielen, danach rückwärts zurück zur Mitte.',
+      '4 × 8 Bälle pro Person, dann Wechsel.',
+    ],
+    variationen: [
+      'Leichter: ohne Rückweg, Shuttle aus der Hand des Partners gespielt.',
+      'Schwerer: Zuspieler variiert unangekündigt zwischen Netzdrop und Lob — Schläger reagiert.',
+    ],
+    fehlerbilder: [
+      'Treffpunkt tief unter der Netzkante → früher starten, Schläger schon im Lauf anheben.',
+      'Oberkörper kippt ins Netz → Ausfallschritt länger, Rumpf bleibt aufrecht, hinteres Bein als Gegengewicht.',
+    ],
+    animationId: 'anim-netzdrop',
+  },
+  {
+    id: 'st-11',
+    name: 'Netz-Lob präzise hinten raus',
+    kategorie: 'schlagtechnik',
+    skills: ['netzspiel', 'clear'],
+    niveau: ['anfaenger', 'fortgeschritten'],
+    dauerMin: 10,
+    personen: 'paar',
+    material: ['Klebeband (Zielzone)'],
+    kurzbeschreibung:
+      'Den Unterhand-Lob vom Netz hoch und tief in die Gegner-Grundlinie spielen — die sichere Antwort auf den Netzdrop.',
+    durchfuehrung: [
+      'Zielzone: letzte 80 cm vor der Grundlinie markieren.',
+      'Partner spielt Netzdrops, Schläger antwortet mit hohen Lobs in die Zone — 10 Vorhand, 10 Rückhand.',
+      'Technikpunkte: Ausfallschritt zum Shuttle, Treffpunkt vorn-oben, Schwung aus Unterarm und Handgelenk steil nach oben.',
+      '2 Durchgänge pro Person, Treffer zählen.',
+    ],
+    variationen: [
+      'Leichter: Zuspiel aus der Hand, Flugkurve egal — nur Länge zählt.',
+      'Schwerer: Täuschung einbauen — Lob aus angedeuteter Netzdrop-Haltung.',
+    ],
+    fehlerbilder: [
+      'Lob zu flach (abfangbar) → höher über den ausgestreckten Schläger eines gedachten Gegners spielen; Höhe vor Länge.',
+    ],
+    animationId: 'anim-netzlob-rh',
+  },
+  {
+    id: 'st-12',
+    name: 'Töten am Netz (Netz-Kill)',
+    kategorie: 'schlagtechnik',
+    skills: ['netzspiel', 'schnelligkeit'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 8,
+    personen: 'paar',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Zu hohe Bälle über der Netzkante kompromisslos nach unten töten — ohne Netzberührung.',
+    durchfuehrung: [
+      'Zuspieler wirft oder spielt Shuttles knapp über Netzkantenhöhe ins Vorfeld.',
+      'Schläger steht einen Schritt hinter dem Netz und tötet mit kurzem Handgelenksschlag steil nach unten.',
+      'Wichtig: kurzer „Stich" statt Ausholen — sonst droht Netzberührung; Schläger nach dem Kill sofort wieder hoch.',
+      '4 × 8 Kills, dann Wechsel.',
+    ],
+    variationen: [
+      'Leichter: Zuspiel höher und langsamer.',
+      'Schwerer: Wechsel zwischen Kill (hoher Ball) und Netzdrop (knapper Ball) — Entscheidung in Echtzeit.',
+    ],
+    fehlerbilder: [
+      'Großes Ausholen, Schläger berührt das Netz → nur aus dem Handgelenk „hacken", Bewegung vor dem Netz stoppen.',
+      'Treffpunkt zu tief gewartet → früher hochgehen: Treffen über der Kante, nicht auf ihr.',
+    ],
+    animationId: 'anim-netzkill',
+  },
+  {
+    id: 'st-13',
+    name: 'Abwehr-Block gegen Smash',
+    kategorie: 'schlagtechnik',
+    skills: ['drive', 'netzspiel'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 10,
+    personen: 'paar',
+    material: [],
+    kurzbeschreibung:
+      'Smashes mit ruhigem Block flach ins Vorfeld zurücklegen — aus der Abwehr den Angriff drehen.',
+    durchfuehrung: [
+      'Angreifer smasht mit 70–80 % aus dem Hinterfeld, Verteidiger steht mittig-tief mit Rückhandgriff vor dem Körper.',
+      'Block-Return kurz hinter das Netz: Schläger nur hinhalten, Tempo des Smashes schluckt der lockere Griff.',
+      '3 × 10 Smashes, danach Rollen tauschen.',
+      'Steigerung: Verteidiger nennt vor dem Block die Zielecke („links/rechts").',
+    ],
+    variationen: [
+      'Leichter: Angreifer spielt schnelle Drops statt Smashes.',
+      'Schwerer: Block abwechselnd longline und cross; oder als Konter-Drive zurück.',
+    ],
+    fehlerbilder: [
+      'Verkrampfter Griff, Shuttle springt weit ins Mittelfeld → Griffdruck erst im Treffmoment leicht erhöhen, davor locker.',
+      'Verteidiger steht aufrecht → tiefer Stand, Beine schulterbreit, Schläger vor der Hüfte.',
+    ],
+    animationId: 'anim-block',
+  },
+  {
+    id: 'st-14',
+    name: 'Unterhand-Clear aus der Abwehr',
+    kategorie: 'schlagtechnik',
+    skills: ['clear'],
+    niveau: ['anfaenger', 'fortgeschritten'],
+    dauerMin: 10,
+    personen: 'paar',
+    material: [],
+    kurzbeschreibung:
+      'Tiefe Bälle mit dem Unterhand-Clear hoch und weit nach hinten befreien — Zeit kaufen, Feld ordnen.',
+    durchfuehrung: [
+      'Partner spielt halbschnelle Bälle ins Mittelfeld auf Knie- bis Hüfthöhe.',
+      'Schläger spielt Unterhand-Clears hoch zur Grundlinie: Ausfallschritt, Treffpunkt vor dem Knie, kräftiger Schwung von unten nach oben.',
+      '4 × 8 Bälle (2 × Vorhand-, 2 × Rückhandseite), dann Wechsel.',
+    ],
+    variationen: [
+      'Leichter: Zuspiel geworfen, Distanz kürzer.',
+      'Schwerer: Zuspieler greift die Befreiungen mit Drops an — daraus entsteht ein Abwehr-Kreislauf.',
+    ],
+    fehlerbilder: [
+      'Befreiung zu kurz, lädt zum Smash ein → ganzer Arm schwingt durch, Gewicht schiebt nach, Höhe bewusst übertreiben.',
+    ],
+    animationId: 'anim-unterhand-clear',
+  },
+  {
+    id: 'st-15',
+    name: 'Rückhand-Überkopf-Clear (Notschlag)',
+    kategorie: 'schlagtechnik',
+    skills: ['clear'],
+    niveau: ['leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Der schwierigste Grundschlag: mit dem Rücken zum Netz aus der Rückhand-Ecke befreien.',
+    durchfuehrung: [
+      'Zuspieler spielt halbhohe Bälle in die tiefe Rückhand-Ecke, bewusst so, dass Umlaufen nicht mehr möglich ist.',
+      'Schläger dreht ein, Ellbogen zeigt zum Shuttle, Treffpunkt hoch über der Schulter, Kraft aus kurzer Unterarm-Außenrotation („Daumen schiebt").',
+      '4 × 6 Bälle mit viel Pause — der Schlag lebt von Präzision, nicht von Wiederholungsmasse.',
+      'Zwischenziel: Shuttle erreicht mindestens das hintere Drittel; Endziel: Grundlinie.',
+    ],
+    variationen: [
+      'Leichter: erst als Rückhand-Drop (kürzerer Weg, gleiches Timing).',
+      'Schwerer: aus echtem Laufweg von der Feldmitte.',
+    ],
+    fehlerbilder: [
+      'Ausholen wie bei der Vorhand mit großem Schwung → Bewegung kompakt halten: Ellbogen hoch, kurzer „Peitschenschlag".',
+      'Treffpunkt zu tief/seitlich → früher abdrücken, letzter Schritt bringt den Körper unter den Shuttle.',
+    ],
+    animationId: 'anim-rh-clear',
+  },
+  {
+    id: 'st-16',
+    name: 'Drive-Training an der Hallenwand',
+    kategorie: 'schlagtechnik',
+    skills: ['drive', 'schnelligkeit'],
+    niveau: ['anfaenger', 'fortgeschritten'],
+    dauerMin: 8,
+    personen: 'allein',
+    material: ['Freie Hallenwand'],
+    kurzbeschreibung:
+      'Drives gegen die Wand — maximale Schlagfrequenz und kurze Ausholwege ganz ohne Partner.',
+    durchfuehrung: [
+      'Mit 2–3 m Wandabstand den Shuttle flach gegen die Wand spielen und direkt wieder annehmen.',
+      '3 × 45 Sekunden: Vorhand und Rückhand im freien Wechsel, 30 Sekunden Pause.',
+      'Schläger bleibt vor dem Körper, Rückhandgriff als Basis, Beine federn mit.',
+      'Zählen: persönlicher Rekord an Wandkontakten ohne Fehler.',
+    ],
+    variationen: [
+      'Leichter: alten/langsamen Shuttle verwenden, Abstand vergrößern.',
+      'Schwerer: nur Rückhand; oder im Halbkniestand (isoliert den Arm).',
+    ],
+    fehlerbilder: [
+      'Ausholen über die Schulter → Frequenz geht verloren; Ellbogen vorn fixieren, Schlag aus dem Unterarm.',
+    ],
+    animationId: 'anim-drive-rh',
+  },
+  {
+    id: 'st-17',
+    name: 'Aufschlag-Serie unter Puls',
+    kategorie: 'schlagtechnik',
+    skills: ['aufschlag', 'ausdauer'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'allein',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Aufschläge mit erhöhtem Puls trainieren — wie im Spiel nach einem langen Ballwechsel.',
+    durchfuehrung: [
+      'Vorbelastung: 20 Sekunden Schattenbadminton mit hohem Tempo.',
+      'Direkt danach 5 Aufschläge: abwechselnd kurz (Rückhand) und lang (Vorhand) auf markierte Ziele.',
+      '6 Runden, zwischen den Runden 40 Sekunden Pause.',
+      'Trefferquote notieren und mit ruhigen Serien vergleichen.',
+    ],
+    variationen: [
+      'Leichter: Vorbelastung auf 10 Sekunden verkürzen.',
+      'Schwerer: Vorbelastung mit Courtsprints, Aufschlag zählt nur in der kleinen Zielzone.',
+    ],
+    fehlerbilder: [
+      'Hektisches Anspiel direkt aus der Bewegung → Routine erzwingen: Stand sortieren, einmal atmen, dann aufschlagen.',
+    ],
+  },
+  {
+    id: 'st-18',
+    name: 'Multishuttle Vorfeld: Drop & Kill',
+    kategorie: 'schlagtechnik',
+    skills: ['netzspiel', 'schnelligkeit', 'beinarbeit'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Schnelles Multishuttle-Zuspiel ins Vorfeld: enge Netzdrops und Kills im Wechsel.',
+    durchfuehrung: [
+      'Zuspieler steht mit Korb am Netzpfosten und wirft im 2-Sekunden-Takt: mal knapp über die Kante (→ Netzdrop), mal etwas höher (→ Kill).',
+      'Schläger arbeitet vom T-Punkt aus, nach jedem Schlag zurück zur Mitte.',
+      '4 × 10 Shuttles, zwischen den Serien 45 Sekunden Pause; dann Wechsel.',
+    ],
+    variationen: [
+      'Leichter: Takt auf 3–4 Sekunden strecken, nur Netzdrops.',
+      'Schwerer: Zuspiel zusätzlich auf Vorhand/Rückhand verteilt, Serie auf 15 Shuttles.',
+    ],
+    fehlerbilder: [
+      'Schläger hängt zwischen den Bällen unter der Hüfte → Vorhalte: Schlägerkopf bleibt auf Netzhöhe.',
+      'Kill trotz tiefem Treffpunkt erzwungen → tiefe Bälle als Drop akzeptieren; Entscheidung laut ansagen lassen.',
+    ],
+  },
+  {
+    id: 'st-19',
+    name: 'Multishuttle Hinterfeld: Clear-Drop-Smash-Mix',
+    kategorie: 'schlagtechnik',
+    skills: ['clear', 'drop', 'smash', 'ausdauer'],
+    niveau: ['fortgeschritten', 'leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Hohe Multishuttle-Zuspiele ins Hinterfeld, Schlagwahl auf Zuruf — alle Überkopfschläge in einem Drill.',
+    durchfuehrung: [
+      'Zuspieler bringt aus dem Korb hohe Bälle im 3-Sekunden-Takt ins Hinterfeld.',
+      'Beim Anwurf Zuruf: „Clear", „Drop" oder „Smash" — Schläger setzt um und läuft zwischen den Bällen zur Mitte zurück.',
+      '3 × 12 Shuttles pro Person, 60 Sekunden Pause zwischen den Serien.',
+    ],
+    variationen: [
+      'Leichter: feste Reihenfolge statt Zuruf (Clear–Clear–Drop).',
+      'Schwerer: Zuspiel abwechselnd in beide Hinterfeld-Ecken, Rückweg über die Mitte Pflicht.',
+    ],
+    fehlerbilder: [
+      'Alle Schläge sehen unterschiedlich aus → einheitliche Ausholbewegung einfordern; Zuspieler kontrolliert.',
+      'Laufweg wird geschlabbert → ohne Mitte-Kontakt zählt der Shuttle nicht.',
+    ],
+  },
+  {
+    id: 'st-20',
+    name: 'Sprungsmash-Heranführung',
+    kategorie: 'schlagtechnik',
+    skills: ['smash', 'schnelligkeit'],
+    niveau: ['leistung'],
+    dauerMin: 12,
+    personen: 'paar',
+    material: ['Shuttle-Korb'],
+    kurzbeschreibung:
+      'Methodische Reihe zum Sprungsmash: vom Standsmash über den Block-Sprung zum Smash aus dem Umsprung.',
+    durchfuehrung: [
+      'Stufe 1 (4 Bälle): Standsmash mit bewusst hohem Treffpunkt.',
+      'Stufe 2 (4 Bälle): beidbeiniger Block-Sprung am Ort, Smash im höchsten Punkt — Landung federnd auf beiden Ballen.',
+      'Stufe 3 (4 Bälle): Zuspiel leicht hinter den Schläger, Umsprung (Scissor) mit Smash, Landung auf dem Schlagbein-Gegenfuß vorn.',
+      '2 Durchgänge pro Person, viel Pause — Sprungqualität geht vor.',
+    ],
+    variationen: [
+      'Leichter: bei Stufe 2 bleiben, Sprunghöhe reduzieren.',
+      'Schwerer: Stufe 3 mit anschließendem Nachrücken ans Netz und Kill auf den zweiten Shuttle.',
+    ],
+    fehlerbilder: [
+      'Absprung nach vorn statt nach oben, Treffpunkt hinter dem Körper → Zuspiel abwarten, Absprung erst, wenn der Shuttle fällt.',
+      'Harte, flachfüßige Landung → Landung aktiv über die Ballen abfedern, Knie leicht gebeugt.',
+    ],
+    animationId: 'anim-sprungsmash',
+  },
+]

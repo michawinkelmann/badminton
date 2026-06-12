@@ -1,0 +1,91 @@
+@import 'tailwindcss';
+
+/*
+ * Design-Tokens — siehe docs/design.md
+ * Verankerung: Turniermatte (Grün), Courtlinie (Weiß), Schul-Plastikball (Gelb), Kork.
+ */
+@theme {
+  --color-court: #0e6b4a;
+  --color-court-tief: #0a4a34;
+  --color-linie: #fbfbf6;
+  --color-boden: #eef0ea;
+  --color-signal: #f5c518;
+  --color-kork: #b4793b;
+  --color-tinte: #15241d;
+
+  --font-sans: 'Archivo Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--color-boden);
+    color: var(--color-tinte);
+  }
+
+  /* Sichtbarer Tastatur-Fokus (Pflicht §12) */
+  :focus-visible {
+    outline: 3px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Display-Stimme: Trikot/Anzeigetafel */
+  .schrift-display {
+    font-stretch: 125%;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  /* Signatur-Element: Doppellinie (Seitenlinie des Doppelfelds) */
+  .doppellinie {
+    position: relative;
+    padding-bottom: 12px;
+  }
+  .doppellinie::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 72px;
+    border-top: 4px solid var(--color-court);
+    box-shadow: 0 7px 0 0 var(--color-signal);
+  }
+
+  /* Score-/Tabellenziffern */
+  .ziffern {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ---------- Druck (§5, §12): nüchtern, s/w-tauglich ---------- */
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
+@media print {
+  html {
+    background: white;
+  }
+  header,
+  nav {
+    display: none !important;
+  }
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
