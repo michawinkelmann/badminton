@@ -42,11 +42,6 @@ export default function Start() {
           </Link>
         ))}
       </div>
-
-      <p className="mt-8 rounded-lg border-2 border-kork/40 bg-linie p-4 text-sm text-tinte/70">
-        Stand: Bibliothek, Einheiten-Builder, Bewegungslehre, Profile mit Skill-Radar,
-        Mehrwochen-Programme und der komplette Turnierplaner sind nutzbar. Als Nächstes: der Beamer-Modus.
-      </p>
     </div>
   )
 }
