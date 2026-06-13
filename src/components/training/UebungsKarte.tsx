@@ -11,7 +11,11 @@ interface Props {
 
 export default function UebungsKarte({ uebung, istEigene = false }: Props) {
   const [offen, setOffen] = useState(false)
-  const hatDetails = !!(uebung.skizze || (uebung.beschreibung && uebung.beschreibung.length > 0))
+  const hatSkizze = !!uebung.skizze
+  const hatBeschreibung = !!(uebung.beschreibung && uebung.beschreibung.length > 0)
+  const hatDetails = hatSkizze || hatBeschreibung
+  const detailLabel =
+    hatSkizze && hatBeschreibung ? 'Skizze & Beschreibung' : hatSkizze ? 'Skizze' : 'Beschreibung'
 
   return (
     <div className="flex flex-col rounded-xl border-2 border-court/25 bg-linie transition-colors hover:border-court focus-within:border-court">
@@ -53,13 +57,13 @@ export default function UebungsKarte({ uebung, istEigene = false }: Props) {
             type="button"
             onClick={() => setOffen((o) => !o)}
             aria-expanded={offen}
-            aria-label={`${uebung.name}: ${offen ? 'Details verbergen' : 'Skizze & Beschreibung zeigen'}`}
+            aria-label={`${uebung.name}: ${offen ? 'Details verbergen' : `${detailLabel} zeigen`}`}
             className="mt-1 flex min-h-9 w-full items-center gap-1.5 text-xs font-semibold text-court hover:text-court-tief"
           >
             <span aria-hidden="true" className={`transition-transform ${offen ? 'rotate-90' : ''}`}>
               ▸
             </span>
-            {offen ? 'Details verbergen' : 'Skizze & Beschreibung'}
+            {offen ? 'Details verbergen' : detailLabel}
           </button>
           {offen && (
             <div className="mt-2 space-y-2 border-t border-boden pt-2">
