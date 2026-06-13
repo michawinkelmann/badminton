@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react'
+import { einschaetzungenCsv, logsCsv } from '../utils/csv'
+import { alleEinheitenMitVorlagen } from '../data/programme'
 import { useAppStore, nurDaten } from '../store'
 import {
   downloadTextDatei,
@@ -13,6 +15,8 @@ type Vorschau = Exclude<ImportErgebnis, { typ: 'fehler' }>
 
 export default function Einstellungen() {
   const store = useAppStore()
+  const demoLaden = useAppStore((s) => s.demoLaden)
+  const demoEntfernen = useAppStore((s) => s.demoEntfernen)
   const dateiInput = useRef<HTMLInputElement>(null)
 
   const [importFehler, setImportFehler] = useState<string>()
@@ -129,6 +133,68 @@ export default function Einstellungen() {
         >
           Daten exportieren
         </button>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              downloadTextDatei(
+                `einschaetzungen-${new Date().toISOString().slice(0, 10)}.csv`,
+                einschaetzungenCsv(daten.profile, daten.einschaetzungen),
+              )
+            }
+            className="min-h-11 rounded-md border-2 border-court px-4 text-sm font-semibold text-court hover:bg-boden"
+          >
+            Einschätzungen als CSV
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              downloadTextDatei(
+                `trainingslog-${new Date().toISOString().slice(0, 10)}.csv`,
+                logsCsv(daten.profile, daten.logs, alleEinheitenMitVorlagen(daten.einheiten)),
+              )
+            }
+            className="min-h-11 rounded-md border-2 border-court px-4 text-sm font-semibold text-court hover:bg-boden"
+          >
+            Trainingslog als CSV
+          </button>
+        </div>
+        <p className="mt-2 text-xs text-tinte/60">
+          CSV öffnet direkt in Excel (Semikolon-getrennt) — z. B. für die Notenliste.
+        </p>
+      </section>
+
+      {/* ---------- Beispieldaten ---------- */}
+      <section className="mt-6 rounded-xl border-2 border-kork/50 bg-linie p-5">
+        <h2 className="schrift-display text-lg">Beispieldaten</h2>
+        <p className="mt-2 text-sm text-tinte/75">
+          Zum Kennenlernen: 8 Profile mit Einschätzungen, eine Gruppe mit Trainingshistorie,
+          zwei Einheiten, eine Programm-Zuweisung, Termine sowie ein fertig gespieltes und
+          ein laufendes Turnier. Alles ist mit „Demo" markiert und lässt sich mit einem
+          Klick rückstandsfrei entfernen — deine eigenen Daten bleiben unberührt.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              demoLaden()
+              setMeldung('Beispieldaten geladen — schau dir Profile, Kalender und Turniere an.')
+            }}
+            className="min-h-11 rounded-md bg-court px-4 text-sm font-semibold text-linie hover:bg-court-tief"
+          >
+            Beispieldaten laden
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              demoEntfernen()
+              setMeldung('Alle Beispieldaten entfernt.')
+            }}
+            className="min-h-11 rounded-md border-2 border-court px-4 text-sm font-semibold text-court hover:bg-boden"
+          >
+            Beispieldaten entfernen
+          </button>
+        </div>
       </section>
 
       {/* ---------- Import ---------- */}

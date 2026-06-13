@@ -20,6 +20,11 @@ import Turniere from './pages/Turniere'
 import TurnierNeu from './pages/TurnierNeu'
 import TurnierDetail from './pages/TurnierDetail'
 import TurnierDruck from './pages/TurnierDruck'
+import Kalender from './pages/Kalender'
+import Regeln from './pages/Regeln'
+import StationsKarten from './pages/StationsKarten'
+import TurnierUrkunden from './pages/TurnierUrkunden'
+import TurnierZettel from './pages/TurnierZettel'
 import Einstellungen from './pages/Einstellungen'
 import Rechtliches from './pages/Rechtliches'
 import Beamer from './pages/Beamer'
@@ -35,11 +40,13 @@ export default function App() {
         <Route path="/uebungen" element={<Uebungen />} />
         <Route path="/uebungen/neu" element={<UebungNeu />} />
         <Route path="/uebungen/:uebungId" element={<UebungDetail />} />
+        <Route path="/uebungen/:uebungId/karte" element={<StationsKarten />} />
         <Route path="/uebungen/:uebungId/bearbeiten" element={<UebungBearbeiten />} />
         <Route path="/einheiten" element={<Einheiten />} />
         <Route path="/einheiten/neu" element={<EinheitenBuilder />} />
         <Route path="/einheiten/:einheitId" element={<EinheitenBuilder />} />
         <Route path="/einheiten/:einheitId/drucken" element={<EinheitDruck />} />
+        <Route path="/einheiten/:einheitId/karten" element={<StationsKarten />} />
         <Route path="/programme" element={<Programme />} />
         <Route path="/programme/neu" element={<ProgrammEditor />} />
         <Route path="/programme/zuweisungen/:zuweisungId" element={<ZuweisungDetail />} />
@@ -54,6 +61,10 @@ export default function App() {
         <Route path="/turniere/:turnierId" element={<TurnierDetail />} />
         <Route path="/turniere/:turnierId/setup" element={<TurnierNeu />} />
         <Route path="/turniere/:turnierId/drucken" element={<TurnierDruck />} />
+        <Route path="/turniere/:turnierId/urkunden" element={<TurnierUrkunden />} />
+        <Route path="/turniere/:turnierId/zettel" element={<TurnierZettel />} />
+        <Route path="/kalender" element={<Kalender />} />
+        <Route path="/regeln" element={<Regeln />} />
         <Route path="/einstellungen" element={<Einstellungen />} />
         <Route path="/rechtliches" element={<Rechtliches />} />
         <Route path="*" element={<Navigate to="/" replace />} />

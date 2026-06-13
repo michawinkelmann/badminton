@@ -1,7 +1,7 @@
 /** Tests: Felder-Scheduler — Wartezeit-Fairness, keine Doppel-Einsätze. */
 import { describe, expect, it } from 'vitest'
 import type { Match } from '../../datenmodell'
-import { naechsteSpiele, spielbereiteMatches, weiseFelderZu } from './scheduler'
+import { geschaetztesEnde, naechsteSpiele, spielbereiteMatches, wartezeitMin, weiseFelderZu } from './scheduler'
 
 let nr = 0
 function offen(a: string, b: string, extras: Partial<Match> = {}): Match {
@@ -74,5 +74,52 @@ describe('Scheduler (§9.1)', () => {
       offen('A', 'B'),
     ]
     expect(weiseFelderZu(matches, 2)).toHaveLength(1)
+  })
+})
+
+describe('Zeitschätzung (geschätztes Ende)', () => {
+  const T0 = Date.parse('2026-06-12T10:00:00Z')
+  const iso = (ms: number) => new Date(ms).toISOString()
+  const fertig = (id: string, um: number): Match => ({
+    id, teilnehmerAId: `${id}-a`, teilnehmerBId: `${id}-b`,
+    saetze: [{ a: 15, b: 9 }], siegerId: `${id}-a`, status: 'beendet', beendetUm: iso(um),
+  })
+  const wartet = (id: string): Match => ({
+    id, teilnehmerAId: `${id}-a`, teilnehmerBId: `${id}-b`, saetze: [], status: 'offen',
+  })
+
+  it('undefined bei weniger als zwei beendeten Spielen', () => {
+    expect(geschaetztesEnde([fertig('1', T0), wartet('2')], T0)).toBeUndefined()
+  })
+
+  it('rechnet mit dem mittleren Abstand der letzten Spiele', () => {
+    const matches = [fertig('1', T0), fertig('2', T0 + 10 * 60_000), fertig('3', T0 + 20 * 60_000), wartet('4'), wartet('5')]
+    // Ø 10 Min Abstand, 2 offene Spiele → Ende = letztes Ende + 20 Min
+    expect(geschaetztesEnde(matches, T0 + 20 * 60_000)).toBe(T0 + 40 * 60_000)
+  })
+
+  it('nutzt jetzt als Basis, wenn länger nichts endete', () => {
+    const matches = [fertig('1', T0), fertig('2', T0 + 5 * 60_000), wartet('3')]
+    const jetzt = T0 + 90 * 60_000
+    expect(geschaetztesEnde(matches, jetzt)).toBe(jetzt + 5 * 60_000)
+  })
+})
+
+describe('Wartezeit einer Paarung', () => {
+  const T0 = Date.parse('2026-06-12T14:00:00Z')
+  const iso = (ms: number) => new Date(ms).toISOString()
+
+  it('zählt ab dem späteren letzten Spiel beider Beteiligter', () => {
+    const matches: Match[] = [
+      { id: 'f1', teilnehmerAId: 'A', teilnehmerBId: 'X', saetze: [{ a: 15, b: 3 }], status: 'beendet', siegerId: 'A', beendetUm: iso(T0) },
+      { id: 'f2', teilnehmerAId: 'B', teilnehmerBId: 'Y', saetze: [{ a: 15, b: 7 }], status: 'beendet', siegerId: 'B', beendetUm: iso(T0 + 10 * 60_000) },
+      { id: 'n', teilnehmerAId: 'A', teilnehmerBId: 'B', saetze: [], status: 'offen' },
+    ]
+    expect(wartezeitMin(matches[2]!, matches, T0 + 25 * 60_000)).toBe(15)
+  })
+
+  it('undefined, wenn beide noch nie gespielt haben', () => {
+    const n: Match = { id: 'n', teilnehmerAId: 'A', teilnehmerBId: 'B', saetze: [], status: 'offen' }
+    expect(wartezeitMin(n, [n], T0)).toBeUndefined()
   })
 })

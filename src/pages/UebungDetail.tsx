@@ -5,6 +5,7 @@ import { KATEGORIE_NAMEN, NIVEAU_NAMEN, PERSONEN_NAMEN, SKILL_NAMEN } from '../d
 import { useAppStore } from '../store'
 import BestaetigungsDialog from '../components/ui/BestaetigungsDialog'
 import AnimationsAnsicht from '../components/animation/AnimationsAnsicht'
+import SkizzenAnsicht from '../components/training/SkizzenAnsicht'
 import { findeAnimation } from '../data/animationen'
 
 function Abschnitt({ titel, children }: { titel: string; children: React.ReactNode }) {
@@ -60,6 +61,12 @@ export default function UebungDetail() {
 
       <h1 className="schrift-display doppellinie mt-3 text-3xl">{uebung.name}</h1>
       <p className="mt-5 text-lg text-tinte/85">{uebung.kurzbeschreibung}</p>
+      <Link
+        to={`/uebungen/${uebung.id}/karte`}
+        className="mt-3 inline-flex min-h-11 items-center rounded-md border-2 border-court px-4 text-sm font-semibold text-court hover:bg-linie print:hidden"
+      >
+        Als Stationskarte drucken (A5)
+      </Link>
 
       <dl className="ziffern mt-5 grid grid-cols-2 gap-3 rounded-xl border-2 border-court/25 bg-linie p-4 text-sm sm:grid-cols-4">
         <div>
@@ -89,6 +96,28 @@ export default function UebungDetail() {
           </span>
         ))}
       </div>
+
+      {/* Ausführliche Beschreibung + Skizze: Aufbau verstehen, bevor die Schritte kommen */}
+      {(uebung.beschreibung?.length || uebung.skizze) && (
+        <Abschnitt titel="Aufbau & Ablauf">
+          <div className="rounded-xl border-2 border-court/25 bg-linie p-4">
+            {uebung.skizze && (
+              <div className="mx-auto max-w-xl rounded-lg bg-boden/60 p-3">
+                <SkizzenAnsicht skizze={uebung.skizze} name={uebung.name} />
+              </div>
+            )}
+            {uebung.beschreibung && uebung.beschreibung.length > 0 && (
+              <div className={`space-y-3 ${uebung.skizze ? 'mt-4' : ''}`}>
+                {uebung.beschreibung.map((absatz, i) => (
+                  <p key={i} className="text-sm leading-relaxed text-tinte/90">
+                    {absatz}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
+        </Abschnitt>
+      )}
 
       <Abschnitt titel="Durchführung">
         <ol className="space-y-2">

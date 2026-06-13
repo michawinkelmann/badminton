@@ -9,6 +9,7 @@
     "build:lokal": "vite build --config vite.config.lokal.ts && node scripts/baue-lokal.mjs",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:e2e": "vite build && playwright test",
     "icons": "node scripts/icons.mjs"
   },
   "dependencies": {
@@ -25,6 +26,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/vite": "^4.3.0",
     "@types/node": "^25.9.3",
     "@types/react": "^19.2.17",

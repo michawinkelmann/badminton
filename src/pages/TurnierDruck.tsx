@@ -55,6 +55,8 @@ export default function TurnierDruck() {
 
   return (
     <div className="mx-auto max-w-3xl">
+      <style>{'@media print { @page { size: A4 portrait; margin: 12mm } }'}</style>
+
       <div className="flex flex-wrap gap-3 print:hidden">
         <button type="button" onClick={() => window.print()} className="min-h-11 rounded-md bg-court px-5 text-sm font-semibold text-linie hover:bg-court-tief">
           Drucken

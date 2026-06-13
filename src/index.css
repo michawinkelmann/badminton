@@ -21,6 +21,7 @@
     font-family: var(--font-sans);
     background-color: var(--color-boden);
     color: var(--color-tinte);
+    color-scheme: light dark;
   }
 
   /* Sichtbarer Tastatur-Fokus (Pflicht §12) */
@@ -70,6 +71,44 @@
   }
 }
 
+/* ---------- Dark Mode (folgt dem System, §-Erweiterung) ----------
+ * Alle Farben laufen über die Tokens — hier werden sie für dunkle Systeme
+ * umgedreht. Druckansichten und Beamer nutzen Festfarben und bleiben unberührt.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-court: #3aa97f;
+    --color-court-tief: #2c8a66;
+    --color-linie: #18221c;
+    --color-boden: #0c1310;
+    --color-kork: #c98f55;
+    --color-tinte: #e6ebe6;
+    /* --color-signal bleibt: Gelb trägt auf hell wie dunkel. */
+  }
+
+  /* Auf Signal-Gelb braucht es immer dunkle Tinte — egal welche Text-Utility dransteht. */
+  .bg-signal {
+    color: #15241d !important;
+  }
+
+  /* Destruktive Rottöne: auf Dunkel hellere Schrift, gedämpfte Flächen. */
+  .text-red-800,
+  .text-red-700,
+  .hover\:text-red-700:hover {
+    color: #fda4af;
+  }
+  .bg-red-50 {
+    background-color: rgb(159 18 57 / 0.2);
+  }
+  .hover\:bg-red-50:hover {
+    background-color: rgb(159 18 57 / 0.3);
+  }
+  .border-red-700,
+  .border-red-700\/50 {
+    border-color: #be4455;
+  }
+}
+
 /* ---------- Druck (§5, §12): nüchtern, s/w-tauglich ---------- */
 @page {
   size: A4;
@@ -77,6 +116,14 @@
 }
 
 @media print {
+  :root {
+    --color-court: #0e6b4a;
+    --color-court-tief: #0a4a34;
+    --color-linie: #fbfbf6;
+    --color-boden: #ffffff;
+    --color-kork: #b4793b;
+    --color-tinte: #15241d;
+  }
   html {
     background: white;
   }

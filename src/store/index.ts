@@ -13,12 +13,14 @@ import type {
   Programm,
   ProgrammZuweisung,
   SkillId,
+  Termin,
   Turnier,
   Uebung,
 } from '../datenmodell'
 import { AKTUELLE_SCHEMA_VERSION, leererAppState } from '../datenmodell'
 import { findeEinheitMitVorlagen, findeProgramm } from '../data/programme'
 import { erzeugeAbhakLog } from '../utils/tracking'
+import { erzeugeDemoDaten } from '../data/demo'
 import {
   alleSpieleBeendet,
   aktuelleSchweizerRunde,
@@ -89,15 +91,39 @@ interface AppActions {
   turnierSchweizerRundeAuslosen: (turnierId: string) => void
 
   // Import / Export / Reset
+  terminAnlegen: (termin: Omit<Termin, 'id'>) => Termin
+  terminAktualisieren: (termin: Termin) => void
+  terminLoeschen: (id: string) => void
+
   importErsetzen: (daten: AppState) => void
   turniereHinzufuegen: (turniere: Turnier[]) => void
   einheitenHinzufuegen: (einheiten: Einheit[], eigeneUebungen?: Uebung[]) => void
   allesLoeschen: () => void
+  demoLaden: () => void
+  demoEntfernen: () => void
 }
 
 export type AppStore = AppState & AppActions
 
 /** Datenfelder aus dem Store herausgreifen (für Export & Persistenz). */
+function istDemo(e: { id: string }): boolean {
+  return e.id.startsWith('demo-')
+}
+
+/** Entfernt alle Demodaten (Ids mit 'demo-'-Präfix) aus dem State. */
+function ohneDemo(s: AppState) {
+  return {
+    profile: s.profile.filter((e) => !istDemo(e)),
+    gruppen: s.gruppen.filter((e) => !istDemo(e)),
+    einheiten: s.einheiten.filter((e) => !istDemo(e)),
+    zuweisungen: s.zuweisungen.filter((e) => !istDemo(e)),
+    logs: s.logs.filter((e) => !istDemo(e)),
+    einschaetzungen: s.einschaetzungen.filter((e) => !istDemo(e)),
+    turniere: s.turniere.filter((e) => !istDemo(e)),
+    termine: s.termine.filter((e) => !istDemo(e)),
+  }
+}
+
 export function nurDaten(s: AppState): AppState {
   return {
     schemaVersion: s.schemaVersion,
@@ -110,6 +136,7 @@ export function nurDaten(s: AppState): AppState {
     logs: s.logs,
     einschaetzungen: s.einschaetzungen,
     turniere: s.turniere,
+    termine: s.termine,
   }
 }
 
@@ -444,6 +471,16 @@ export const useAppStore = create<AppStore>()(
       },
 
       /* ---------- Import / Export / Reset ---------- */
+      terminAnlegen: (termin) => {
+        const neu: Termin = { ...termin, id: `termin-${nanoid(8)}` }
+        set((s) => ({ termine: [...s.termine, neu] }))
+        return neu
+      },
+      terminAktualisieren: (termin) =>
+        set((s) => ({ termine: s.termine.map((t) => (t.id === termin.id ? termin : t)) })),
+      terminLoeschen: (id) =>
+        set((s) => ({ termine: s.termine.filter((t) => t.id !== id) })),
+
       importErsetzen: (daten) => set(() => ({ ...daten })),
 
       turniereHinzufuegen: (turniere) => {
@@ -473,6 +510,22 @@ export const useAppStore = create<AppStore>()(
       },
 
       allesLoeschen: () => set(() => ({ ...leererAppState })),
+      demoLaden: () =>
+        set((s) => {
+          const ohne = ohneDemo(s)
+          const demo = erzeugeDemoDaten()
+          return {
+            profile: [...ohne.profile, ...demo.profile],
+            gruppen: [...ohne.gruppen, ...demo.gruppen],
+            einheiten: [...ohne.einheiten, ...demo.einheiten],
+            zuweisungen: [...ohne.zuweisungen, ...demo.zuweisungen],
+            logs: [...ohne.logs, ...demo.logs],
+            einschaetzungen: [...ohne.einschaetzungen, ...demo.einschaetzungen],
+            turniere: [...ohne.turniere, ...demo.turniere],
+            termine: [...ohne.termine, ...demo.termine],
+          }
+        }),
+      demoEntfernen: () => set((s) => ohneDemo(s)),
     }),
     {
       name: 'badminton-planer:v1',

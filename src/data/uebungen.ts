@@ -13,6 +13,7 @@ import { taktikEinzel } from './uebungen/taktikEinzel'
 import { taktikDoppel } from './uebungen/taktikDoppel'
 import { kondition } from './uebungen/kondition'
 import { spielformen } from './uebungen/spielformen'
+import { uebungsDetails } from './uebungen/details'
 
 export const uebungsBibliothek: Uebung[] = [
   ...aufwaermen,
@@ -22,7 +23,8 @@ export const uebungsBibliothek: Uebung[] = [
   ...taktikDoppel,
   ...kondition,
   ...spielformen,
-]
+  // Ausführliche Beschreibungen & Skizzen aus den Detail-Dateien einmergen
+].map((u) => ({ ...u, ...uebungsDetails[u.id] }))
 
 /** Bibliothek + eigene Übungen zusammenführen (eigene zuletzt). */
 export function alleUebungen(eigene: Uebung[]): Uebung[] {

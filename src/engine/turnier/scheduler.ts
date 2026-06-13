@@ -84,3 +84,55 @@ export function weiseFelderZu(
   }
   return zuweisungen
 }
+
+/* ---------- Zeitschätzung & Wartezeit (§-Erweiterung Turnierleitung) ---------- */
+
+const MIN_MS = 60_000
+
+/**
+ * Voraussichtliches Turnierende über den Durchsatz: mittlerer Abstand zwischen
+ * den letzten Match-Enden × Zahl der offenen Spiele. Lange Lücken (Pausen)
+ * werden gekappt, damit die Schätzung nicht explodiert.
+ * undefined, solange weniger als zwei Spiele beendet sind.
+ */
+export function geschaetztesEnde(matches: Match[], jetzt: number): number | undefined {
+  const enden = matches
+    .filter((m) => m.beendetUm !== undefined)
+    .map((m) => Date.parse(m.beendetUm!))
+    .sort((a, b) => a - b)
+  const offene = matches.filter((m) => m.status !== 'beendet').length
+  if (enden.length < 2 || offene === 0) return undefined
+
+  const letzte = enden.slice(-8) // jüngere Spiele zählen mehr als der Turnierstart
+  const abstaende: number[] = []
+  for (let i = 1; i < letzte.length; i++) {
+    const diff = letzte[i]! - letzte[i - 1]!
+    abstaende.push(Math.min(Math.max(diff, MIN_MS), 40 * MIN_MS))
+  }
+  const proSpiel = abstaende.reduce((a, b) => a + b, 0) / abstaende.length
+  const basis = Math.max(enden[enden.length - 1]!, jetzt)
+  return basis + offene * proSpiel
+}
+
+/**
+ * Minuten, die eine Paarung schon wartet: seit dem späteren der letzten
+ * Match-Enden beider Beteiligter. undefined, wenn noch niemand gespielt hat.
+ */
+export function wartezeitMin(match: Match, matches: Match[], jetzt: number): number | undefined {
+  const letztesEnde = (teilnehmerId: string): number | undefined => {
+    const enden = matches
+      .filter(
+        (m) =>
+          m.beendetUm !== undefined &&
+          (m.teilnehmerAId === teilnehmerId || m.teilnehmerBId === teilnehmerId),
+      )
+      .map((m) => Date.parse(m.beendetUm!))
+    return enden.length > 0 ? Math.max(...enden) : undefined
+  }
+  const basisWerte = [match.teilnehmerAId, match.teilnehmerBId]
+    .filter((id): id is string => id !== undefined)
+    .map(letztesEnde)
+    .filter((w): w is number => w !== undefined)
+  if (basisWerte.length === 0) return undefined
+  return Math.max(0, Math.floor((jetzt - Math.max(...basisWerte)) / MIN_MS))
+}

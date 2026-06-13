@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import type { Match, Turnier } from '../datenmodell'
 import {
   berechneTabelle,
+  geschaetztesEnde,
+  wartezeitMin,
   gruppenAusMatches,
   gruppenphaseFertig,
   istRundeKomplett,
@@ -42,6 +44,11 @@ export default function TurnierDetail() {
 
   const turnier = turniere.find((t) => t.id === turnierId)
   const [dialogMatch, setDialogMatch] = useState<Match>()
+  const [jetzt, setJetzt] = useState(() => Date.now())
+  useEffect(() => {
+    const t = window.setInterval(() => setJetzt(Date.now()), 30_000)
+    return () => window.clearInterval(t)
+  }, [])
   const [setupDialog, setSetupDialog] = useState(false)
   const [koStartDialog, setKoStartDialog] = useState(false)
 
@@ -64,6 +71,7 @@ export default function TurnierDetail() {
   const hatErgebnisse = turnier.matches.some((m) => m.status === 'beendet' && m.teilnehmerAId && m.teilnehmerBId)
   const laufende = turnier.matches.filter((m) => m.feld !== undefined && m.status !== 'beendet')
   const naechste = naechsteSpiele(turnier.matches).slice(0, 5)
+  const endeUm = turnier.status === 'laufend' ? geschaetztesEnde(turnier.matches, jetzt) : undefined
   const dialogAktuell = dialogMatch ? turnier.matches.find((m) => m.id === dialogMatch.id) : undefined
 
   /* ---------- Format-Inhalte vorbereiten ---------- */
@@ -129,6 +137,22 @@ export default function TurnierDetail() {
           >
             Beamer-Modus
           </Link>
+          {turnier.status === 'beendet' && (
+            <Link
+              to={`/turniere/${turnier.id}/urkunden`}
+              className="min-h-11 inline-flex items-center rounded-md bg-signal px-3 text-sm font-bold text-tinte hover:opacity-90"
+            >
+              Urkunden
+            </Link>
+          )}
+          {turnier.status === 'laufend' && (
+            <Link
+              to={`/turniere/${turnier.id}/zettel`}
+              className="min-h-11 inline-flex items-center rounded-md border-2 border-court px-3 text-sm font-semibold text-court hover:bg-linie"
+            >
+              Schiedsrichterzettel
+            </Link>
+          )}
           <Link
             to={`/turniere/${turnier.id}/drucken`}
             className="min-h-11 inline-flex items-center rounded-md border-2 border-court px-3 text-sm font-semibold text-court hover:bg-linie"
@@ -180,6 +204,15 @@ export default function TurnierDetail() {
           <section className="mt-6 print:hidden">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="schrift-display doppellinie text-xl">Felder</h2>
+              {endeUm !== undefined && (
+                <p className="ziffern text-sm text-tinte/65">
+                  Voraussichtlich fertig gegen{' '}
+                  <span className="font-bold text-court">
+                    {new Date(endeUm).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                  </span>{' '}
+                  Uhr
+                </p>
+              )}
               {turnier.status === 'laufend' && (
                 <button
                   type="button"
@@ -228,6 +261,12 @@ export default function TurnierDetail() {
                     <li key={m.id} className="rounded-full border-2 border-court/25 bg-linie px-3 py-1.5">
                       <span className="schrift-display mr-1 text-court">{i + 1}</span>
                       {name(m.teilnehmerAId)} – {name(m.teilnehmerBId)}
+                      {(() => {
+                        const pause = wartezeitMin(m, turnier.matches, jetzt)
+                        return pause !== undefined && pause >= 1 ? (
+                          <span className="ziffern ml-1.5 text-xs text-tinte/55">wartet {pause} Min</span>
+                        ) : null
+                      })()}
                     </li>
                   ))}
                 </ol>

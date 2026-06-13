@@ -21,6 +21,11 @@ export default function Profile() {
   const [name, setName] = useState('')
   const [niveau, setNiveau] = useState<Profil['niveau']>('anfaenger')
 
+  const [schnellListe, setSchnellListe] = useState('')
+  const [schnellNiveau, setSchnellNiveau] = useState<Profil['niveau']>('anfaenger')
+  const [schnellGruppe, setSchnellGruppe] = useState('')
+  const [schnellMeldung, setSchnellMeldung] = useState<string>()
+
   const [gruppenForm, setGruppenForm] = useState<Gruppe | 'neu'>()
   const [gruppenName, setGruppenName] = useState('')
   const [mitglieder, setMitglieder] = useState<string[]>([])
@@ -87,6 +92,73 @@ export default function Profile() {
             Profil anlegen
           </button>
         </div>
+
+        {/* Schnelleingabe: ganze Klasse/Gruppe auf einmal */}
+        <details className="mt-4 rounded-lg border-2 border-court/20 bg-boden/50 p-3 open:pb-4">
+          <summary className="cursor-pointer select-none text-sm font-semibold text-court">
+            Schnelleingabe: Namensliste einfügen (z. B. ganze Klasse)
+          </summary>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <label className="block text-xs font-semibold text-tinte/70">
+              Ein Name pro Zeile
+              <textarea
+                value={schnellListe}
+                onChange={(e) => setSchnellListe(e.target.value)}
+                rows={6}
+                placeholder={'Lena\nBen\nMia\n…'}
+                className="mt-1 block w-full rounded-md border-2 border-court/30 bg-linie px-3 py-2 text-base font-normal"
+              />
+            </label>
+            <div className="space-y-3">
+              <label className="block text-xs font-semibold text-tinte/70">
+                Niveau für alle
+                <select
+                  value={schnellNiveau}
+                  onChange={(e) => setSchnellNiveau(e.target.value as Profil['niveau'])}
+                  className="mt-1 block min-h-11 w-full rounded-md border-2 border-court/30 bg-linie px-2 text-sm font-normal"
+                >
+                  {ALLE_NIVEAUS.map((n) => (
+                    <option key={n} value={n}>{NIVEAU_NAMEN[n]}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-xs font-semibold text-tinte/70">
+                Direkt als Gruppe anlegen (optional)
+                <input
+                  value={schnellGruppe}
+                  onChange={(e) => setSchnellGruppe(e.target.value)}
+                  placeholder="z. B. Klasse 8b"
+                  className="mt-1 block min-h-11 w-full rounded-md border-2 border-court/30 bg-linie px-3 text-base font-normal"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  const namen = [...new Set(
+                    schnellListe.split('\n').map((z) => z.trim()).filter((z) => z.length >= 2),
+                  )]
+                  if (namen.length === 0) return
+                  const ids = namen.map((n) => profilAnlegen(n, schnellNiveau).id)
+                  if (schnellGruppe.trim().length >= 2) gruppeAnlegen(schnellGruppe.trim(), ids)
+                  setSchnellMeldung(
+                    `${ids.length} Profile angelegt${schnellGruppe.trim().length >= 2 ? ` und zur Gruppe „${schnellGruppe.trim()}" zusammengefasst` : ''}.`,
+                  )
+                  setSchnellListe('')
+                  setSchnellGruppe('')
+                }}
+                disabled={schnellListe.trim().length < 2}
+                className="min-h-11 w-full rounded-md bg-court px-4 text-sm font-semibold text-linie hover:bg-court-tief disabled:opacity-40"
+              >
+                Alle anlegen
+              </button>
+              {schnellMeldung && (
+                <p role="status" className="rounded-md border-2 border-court/40 bg-linie p-2 text-sm text-court">
+                  {schnellMeldung}
+                </p>
+              )}
+            </div>
+          </div>
+        </details>
       </section>
 
       {/* ---------- Profilliste ---------- */}

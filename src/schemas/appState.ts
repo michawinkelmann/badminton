@@ -62,6 +62,45 @@ export const TrainingsLogSchema = z.object({
   notizen: z.string().optional(),
 })
 
+const SkizzenPunktSchema = z.object({ x: z.number(), y: z.number() })
+
+export const UebungsSkizzeSchema = z.object({
+  spieler: z
+    .array(
+      z.object({
+        pos: SkizzenPunktSchema,
+        label: z.string(),
+        partei: z.enum(['a', 'b']).optional(),
+      }),
+    )
+    .optional(),
+  huetchen: z.array(SkizzenPunktSchema).optional(),
+  zonen: z
+    .array(
+      z.object({
+        x: z.number(),
+        y: z.number(),
+        b: z.number(),
+        h: z.number(),
+        label: z.string().optional(),
+      }),
+    )
+    .optional(),
+  laufwege: z
+    .array(
+      z.object({
+        von: SkizzenPunktSchema,
+        bis: SkizzenPunktSchema,
+        gebogen: z.boolean().optional(),
+      }),
+    )
+    .optional(),
+  shuttlewege: z
+    .array(z.object({ von: SkizzenPunktSchema, bis: SkizzenPunktSchema }))
+    .optional(),
+  hinweis: z.string().optional(),
+})
+
 export const UebungSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -73,6 +112,8 @@ export const UebungSchema = z.object({
   material: z.array(z.string()),
   kurzbeschreibung: z.string(),
   durchfuehrung: z.array(z.string()),
+  beschreibung: z.array(z.string()).optional(),
+  skizze: UebungsSkizzeSchema.optional(),
   variationen: z.array(z.string()).optional(),
   fehlerbilder: z.array(z.string()).optional(),
   animationId: z.string().optional(),
@@ -183,6 +224,17 @@ export const TurnierSchema = z.object({
 })
 
 /** Voll-Export: kompletter AppState */
+export const TerminSchema = z.object({
+  id: z.string(),
+  datum: z.string(),
+  titel: z.string(),
+  typ: z.enum(['training', 'turnier', 'sonstig']),
+  zeit: z.string().optional(),
+  notiz: z.string().optional(),
+  einheitId: z.string().optional(),
+  gruppeId: z.string().optional(),
+})
+
 export const AppStateSchema = z.object({
   schemaVersion: z.number().int().positive(),
   profile: z.array(ProfilSchema),
@@ -194,6 +246,8 @@ export const AppStateSchema = z.object({
   logs: z.array(TrainingsLogSchema),
   einschaetzungen: z.array(SkillEinschaetzungSchema),
   turniere: z.array(TurnierSchema),
+  /** Optional mit Default: ältere Exporte (vor Kalender) bleiben importierbar. */
+  termine: z.array(TerminSchema).default([]),
 })
 
 /** Einzel-Export eines Turniers (zum Weitergeben an Kollegen) */

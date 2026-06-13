@@ -30,8 +30,29 @@ jobs:
         with:
           path: dist
 
+  # E2E-Smoke-Tests (Playwright): klicken die kritischen Pfade gegen vite preview durch
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx vite build
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results
+          retention-days: 7
+
+  # Deploy nur, wenn Unit-Tests/Build UND E2E grün sind
   deploy:
-    needs: build
+    needs: [build, e2e]
     runs-on: ubuntu-latest
     environment:
       name: github-pages

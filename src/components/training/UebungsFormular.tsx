@@ -82,6 +82,7 @@ export default function UebungsFormular({ vorhandene }: Props) {
   )
   const [variationen, setVariationen] = useState<string[]>(vorhandene?.variationen ?? [])
   const [fehlerbilder, setFehlerbilder] = useState<string[]>(vorhandene?.fehlerbilder ?? [])
+  const [beschreibung, setBeschreibung] = useState((vorhandene?.beschreibung ?? []).join('\n\n'))
   const [fehler, setFehler] = useState<string>()
 
   function umschalten<T>(liste: T[], wert: T): T[] {
@@ -107,6 +108,10 @@ export default function UebungsFormular({ vorhandene }: Props) {
       material: material.split(',').map((m) => m.trim()).filter(Boolean),
       kurzbeschreibung: kurzbeschreibung.trim(),
       durchfuehrung: schritte,
+      ...(beschreibung.trim()
+        ? { beschreibung: beschreibung.split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean) }
+        : {}),
+      ...(vorhandene?.skizze ? { skizze: vorhandene.skizze } : {}),
       variationen: variationen.map((v) => v.trim()).filter(Boolean),
       fehlerbilder: fehlerbilder.map((f) => f.trim()).filter(Boolean),
       ...(vorhandene?.animationId ? { animationId: vorhandene.animationId } : {}),
@@ -230,6 +235,17 @@ export default function UebungsFormular({ vorhandene }: Props) {
           value={kurzbeschreibung}
           rows={2}
           onChange={(e) => setKurzbeschreibung(e.target.value)}
+          className="mt-1 w-full rounded-md border-2 border-court/30 bg-linie px-3 py-2 text-sm font-normal"
+        />
+      </label>
+
+      <label className="block text-xs font-semibold text-tinte/70">
+        Ausführliche Beschreibung (optional; Leerzeile = neuer Absatz)
+        <textarea
+          value={beschreibung}
+          rows={5}
+          onChange={(e) => setBeschreibung(e.target.value)}
+          placeholder="Aufbau, Organisation und Ablauf für alle, die die Übung noch nicht kennen …"
           className="mt-1 w-full rounded-md border-2 border-court/30 bg-linie px-3 py-2 text-sm font-normal"
         />
       </label>

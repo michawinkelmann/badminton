@@ -64,6 +64,31 @@ export type Kategorie =
   | 'kondition'
   | 'spielformen'
 
+/**
+ * Statische Court-Skizze einer Übung (Draufsicht, Koordinaten in Metern wie
+ * in der Court-Geometrie: x = Länge 0–13,40, y = Breite 0–6,10, Netz bei 6,70).
+ * Deklarativ gehalten, damit Skizzen als reine Daten neben der Übung leben.
+ */
+export interface SkizzenPunkt {
+  x: number
+  y: number
+}
+
+export interface UebungsSkizze {
+  /** Spieler/Zuspieler als beschriftete Punkte; Partei 'b' wird hohl gezeichnet. */
+  spieler?: { pos: SkizzenPunkt; label: string; partei?: 'a' | 'b' }[]
+  /** Hütchen/Markierungen (Dreiecke). */
+  huetchen?: SkizzenPunkt[]
+  /** Zielzonen/Bereiche als Rechtecke (x/y = Ecke, b/h in Metern). */
+  zonen?: { x: number; y: number; b: number; h: number; label?: string }[]
+  /** Laufwege: gestrichelte Pfeile (gebogen für Umlaufen/Rückwege). */
+  laufwege?: { von: SkizzenPunkt; bis: SkizzenPunkt; gebogen?: boolean }[]
+  /** Shuttle-Flugbahnen: durchgezogene, gebogene Pfeile. */
+  shuttlewege?: { von: SkizzenPunkt; bis: SkizzenPunkt }[]
+  /** Bildunterschrift, z. B. Legende oder Ablauf-Hinweis. */
+  hinweis?: string
+}
+
 export interface Uebung {
   id: string
   name: string
@@ -75,6 +100,8 @@ export interface Uebung {
   material: string[] // z. B. ["Hütchen", "Shuttle-Korb"]
   kurzbeschreibung: string // 1–2 Sätze
   durchfuehrung: string[] // nummerierte Schritte
+  beschreibung?: string[] // ausführliche Erklärung (Absätze) für Unkundige
+  skizze?: UebungsSkizze // statische Court-Skizze (Aufbau/Laufwege)
   variationen?: string[] // leichter/schwerer
   fehlerbilder?: string[] // typischer Fehler → Korrekturhinweis
   animationId?: string // Verweis auf Animation
@@ -118,6 +145,20 @@ export interface ProgrammZuweisung {
   zielTyp: 'profil' | 'gruppe'
   startDatum: string
   abgehakt: { woche: number; einheitId: string; datum: string; logId?: string }[]
+}
+
+// ---------- Kalender (Erweiterung: Saisonplanung mit echten Daten) ----------
+export type TerminTyp = 'training' | 'turnier' | 'sonstig'
+
+export interface Termin {
+  id: string
+  datum: string // ISO-Datum (YYYY-MM-DD)
+  titel: string
+  typ: TerminTyp
+  zeit?: string // z. B. "17:30"
+  notiz?: string
+  einheitId?: string // optionale Verknüpfung zu einer Einheit
+  gruppeId?: string // optionale Verknüpfung zu einer Gruppe
 }
 
 // ---------- Turnier ----------
@@ -278,6 +319,8 @@ export interface AppState {
   logs: TrainingsLog[]
   einschaetzungen: SkillEinschaetzung[]
   turniere: Turnier[]
+  /** Kalender-Termine (Erweiterung; fehlt in alten Exporten und wird dann leer initialisiert). */
+  termine: Termin[]
 }
 
 export const AKTUELLE_SCHEMA_VERSION = 1
@@ -293,4 +336,5 @@ export const leererAppState: AppState = {
   logs: [],
   einschaetzungen: [],
   turniere: [],
+  termine: [],
 }
