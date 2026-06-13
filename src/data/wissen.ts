@@ -20,7 +20,7 @@ export interface GlossarEintrag {
 export const REGEL_ABSCHNITTE: RegelAbschnitt[] = [
   {
     id: 'spielidee',
-    titel: 'Spielidee & Zählweise (aktuell: 2×21)',
+    titel: 'Spielidee & Zählweise (aktuell: 3×21)',
     absaetze: [
       'Badminton wird auf Zeitgewinn gespielt: Der Shuttle darf den Boden nicht berühren, jeder Ballwechsel bringt einen Punkt (Rally-Point-System) — egal, wer aufgeschlagen hat.',
     ],

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { GLOSSAR, REGEL_ABSCHNITTE } from '../data/wissen'
 import { findeAnimation } from '../data/animationen'
@@ -15,6 +15,20 @@ export default function Regeln() {
     )
   }, [suche])
 
+  /**
+   * Sanft zum Abschnitt scrollen statt den Anker dem Browser zu überlassen.
+   * Nötig, weil die App den HashRouter nutzt: Ein echter „#id"-Sprung überschreibt
+   * den Routing-Hash, findet keine Route und landet via Catch-all-Route auf der Startseite.
+   */
+  function springeZu(e: MouseEvent<HTMLAnchorElement>, id: string) {
+    e.preventDefault()
+    const ziel = document.getElementById(id)
+    if (!ziel) return
+    ziel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    ziel.setAttribute('tabindex', '-1')
+    ziel.focus({ preventScroll: true })
+  }
+
   return (
     <div className="max-w-4xl">
       <h1 className="schrift-display doppellinie text-3xl">Regeln & Glossar</h1>
@@ -29,12 +43,13 @@ export default function Regeln() {
           <a
             key={a.id}
             href={`#${a.id}`}
+            onClick={(e) => springeZu(e, a.id)}
             className="min-h-11 inline-flex items-center rounded-full border-2 border-court/30 px-3 text-sm font-semibold text-court hover:border-court"
           >
             {a.titel.split(':')[0]}
           </a>
         ))}
-        <a href="#glossar" className="min-h-11 inline-flex items-center rounded-full border-2 border-court/30 px-3 text-sm font-semibold text-court hover:border-court">
+        <a href="#glossar" onClick={(e) => springeZu(e, 'glossar')} className="min-h-11 inline-flex items-center rounded-full border-2 border-court/30 px-3 text-sm font-semibold text-court hover:border-court">
           Glossar
         </a>
       </nav>

@@ -84,7 +84,7 @@ export function ballpunkte(saetze: SatzErgebnis[]): { a: number; b: number } {
 /** Zählweisen-Presets (§9.3). */
 export const ZAEHLWEISE_PRESETS: { name: string; zaehlweise: Zaehlweise }[] = [
   {
-    name: 'Offiziell 2×21',
+    name: 'Offiziell 3×21',
     zaehlweise: { modus: 'punkte', saetzeZumSieg: 2, punkteProSatz: 21, verlaengerung: true, maxPunkte: 30 },
   },
   {
