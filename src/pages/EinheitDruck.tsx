@@ -54,7 +54,7 @@ export default function EinheitDruck() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-3xl print:max-w-none">
       <style>{'@media print { @page { size: A4 portrait; margin: 12mm } }'}</style>
 
       <div className="flex flex-wrap gap-3 print:hidden">

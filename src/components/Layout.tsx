@@ -32,7 +32,7 @@ function ShuttleLogo() {
 export default function Layout() {
   return (
     <div className="flex min-h-screen flex-col bg-boden text-tinte">
-      <header className="bg-court text-linie">
+      <header className="bg-court text-linie print:hidden">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-1 px-4 pt-3">
           <NavLink to="/" className="flex items-center gap-2.5 py-1">
             <ShuttleLogo />

@@ -127,10 +127,6 @@
   html {
     background: white;
   }
-  header,
-  nav {
-    display: none !important;
-  }
   main {
     max-width: none !important;
     padding: 0 !important;

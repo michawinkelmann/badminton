@@ -55,27 +55,27 @@ export default function StationsKarten() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      {/* A5 quer nur für diese Seite */}
-      <style>{'@media print { @page { size: A5 landscape; margin: 10mm } }'}</style>
+    <div className="mx-auto max-w-2xl print:max-w-none">
+      {/* A4 quer, eine Karte pro Seite */}
+      <style>{'@media print { @page { size: A4 landscape; margin: 12mm } }'}</style>
 
       <div className="flex flex-wrap gap-3 print:hidden">
         <button type="button" onClick={() => window.print()} className="min-h-11 rounded-md bg-court px-5 text-sm font-semibold text-linie hover:bg-court-tief">
-          Drucken ({uebungen.length} {uebungen.length === 1 ? 'Karte' : 'Karten'}, A5 quer)
+          Drucken ({uebungen.length} {uebungen.length === 1 ? 'Karte' : 'Karten'}, A4 quer)
         </button>
         <Link to={zurueck} className="inline-flex min-h-11 items-center rounded-md border-2 border-court px-4 text-sm font-semibold text-court hover:bg-linie">
           Zurück
         </Link>
       </div>
       <p className="mt-2 text-xs text-tinte/60 print:hidden">
-        Tipp: Im Druckdialog A5 bzw. „2 Seiten pro Blatt" auf A4 wählen. {titel && `— ${titel}`}
+        Querformat — eine Karte pro A4-Seite. {titel && `— ${titel}`}
       </p>
 
       <div className="mt-6 space-y-6 print:mt-0 print:space-y-0">
-        {uebungen.map(({ uebung, dauerMin, station }) => (
+        {uebungen.map(({ uebung, dauerMin, station }, idx) => (
           <article
             key={`${station}-${uebung.id}`}
-            className="break-after-page border-4 border-double border-black bg-white p-5 text-black"
+            className={`border-4 border-double border-black bg-white p-5 text-black print:flex print:min-h-[180mm] print:flex-col print:p-8 ${idx < uebungen.length - 1 ? 'break-after-page' : ''}`}
           >
             <header className="flex items-start justify-between gap-3 border-b-2 border-black pb-2">
               <div>
@@ -91,7 +91,7 @@ export default function StationsKarten() {
 
             <p className="mt-2 text-sm">{uebung.kurzbeschreibung}</p>
 
-            <div className={uebung.skizze ? 'mt-2 grid grid-cols-[3fr_2fr] items-start gap-4' : 'mt-2'}>
+            <div className={`mt-2 print:mt-4 print:flex-1 ${uebung.skizze ? 'grid grid-cols-[3fr_2fr] items-start gap-4' : ''}`}>
               <ol className="list-inside list-decimal space-y-1 text-sm font-semibold">
                 {uebung.durchfuehrung.map((schritt, i) => (
                   <li key={i} className="font-normal">
