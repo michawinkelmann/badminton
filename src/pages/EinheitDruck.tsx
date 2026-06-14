@@ -55,7 +55,7 @@ export default function EinheitDruck() {
 
   return (
     <div className="mx-auto max-w-3xl print:max-w-none">
-      <style>{'@media print { @page { size: A4 portrait; margin: 12mm } }'}</style>
+      <style>{'@media print { @page { size: A4 portrait; margin: 16mm 18mm } }'}</style>
 
       <div className="flex flex-wrap gap-3 print:hidden">
         <button
@@ -107,7 +107,7 @@ export default function EinheitDruck() {
         </p>
       </fieldset>
 
-      <div className="mt-6 bg-white p-6 text-black shadow-sm print:mt-0 print:p-0 print:shadow-none">
+      <div className={`mt-6 bg-white p-6 text-black shadow-sm print:mt-0 print:p-0 print:shadow-none ${ausfuehrlich ? '' : 'print:flex print:min-h-[255mm] print:flex-col'}`}>
         <header className="border-b-4 border-double border-black pb-3">
           <h1 className="text-2xl font-bold">{einheit.name}</h1>
           <p className="mt-1 text-sm">
@@ -163,6 +163,13 @@ export default function EinheitDruck() {
             </tr>
           </tfoot>
         </table>
+
+        {/* Notizen füllen bei der Einseiten-Übersicht den Rest der A4-Seite (statt leerer Fläche) */}
+        {!ausfuehrlich && (
+          <div className="mt-4 hidden border-t border-neutral-400 pt-2 print:block print:flex-1">
+            <p className="text-sm font-bold">Notizen</p>
+          </div>
+        )}
 
         {/* Anhang: ausführliche Übungsbeschreibungen (per Checkbox zuschaltbar) */}
         {anhangUebungen.length > 0 && (
