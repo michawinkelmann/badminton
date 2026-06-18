@@ -22,15 +22,15 @@ export const animFlugbahnen: BewegungsAnimation = {
     },
     {
       label: 'Drop',
-      punkte: bezierBahn({ x: 1.6, y: 2.7 }, { x: 4.6, y: 3.4 }, { x: 8.3, y: 0.05 }, 1900, 3300, 12),
+      punkte: bezierBahn({ x: 1.6, y: 2.7 }, { x: 5.8, y: 3.4 }, { x: 8.3, y: 0.05 }, 1900, 3300, 12),
     },
     {
       label: 'Smash',
-      punkte: bezierBahn({ x: 1.6, y: 2.9 }, { x: 5.4, y: 1.6 }, { x: 9.6, y: 0.05 }, 3600, 4300, 10),
+      punkte: bezierBahn({ x: 1.6, y: 3.1 }, { x: 6.4, y: 2.5 }, { x: 9.6, y: 0.05 }, 3600, 4300, 10),
     },
     {
       label: 'Drive',
-      punkte: bezierBahn({ x: 2.2, y: 1.6 }, { x: 6.7, y: 1.8 }, { x: 11.6, y: 0.9 }, 4600, 5500, 10),
+      punkte: bezierBahn({ x: 2.2, y: 1.7 }, { x: 6.7, y: 1.95 }, { x: 11.6, y: 0.9 }, 4600, 5500, 10),
     },
   ],
   phasen: [

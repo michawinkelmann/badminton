@@ -8,6 +8,7 @@
 import { describe, expect, it } from 'vitest'
 import type { BewegungsAnimation } from '../../datenmodell'
 import { BODEN_Y } from '../../engine/pose/figur'
+import { COURT } from '../../engine/pose/court'
 import { interpoliereBahn, interpolierePose } from '../../engine/pose/interpolation'
 import { alleAnimationen, findeAnimation } from './index'
 
@@ -73,6 +74,34 @@ describe('Netzquerung (Figur): immer über die Kante', () => {
       }
       expect(querungen).toBeGreaterThan(0)
     })
+  }
+})
+
+describe('Netzquerung (Vergleichs-Flugbahnen, Seitenansicht): über die Kante', () => {
+  const mitBahnen = alleAnimationen.filter((a) => (a.bahnen?.length ?? 0) > 0)
+  for (const a of mitBahnen) {
+    for (const b of a.bahnen!) {
+      it(`${a.id} – ${b.label}: quert das Netz oberhalb von ${COURT.netzHoehe} m`, () => {
+        const pts = b.punkte
+        let querung: number | undefined
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i]!
+          const q = pts[i + 1]!
+          const dx = q.x - p.x
+          if (dx === 0) continue
+          const u = (COURT.netzX - p.x) / dx
+          if (u > 0 && u <= 1) {
+            querung = p.y + (q.y - p.y) * u
+            break
+          }
+        }
+        expect(querung, `${b.label} quert die Netzlinie nicht`).toBeDefined()
+        expect(
+          querung!,
+          `${b.label} quert zu tief (y=${querung?.toFixed(2)} m, Netz=${COURT.netzHoehe} m)`,
+        ).toBeGreaterThanOrEqual(COURT.netzHoehe)
+      })
+    }
   }
 })
 
