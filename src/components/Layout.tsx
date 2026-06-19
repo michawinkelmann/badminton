@@ -1,6 +1,7 @@
 import UpdateHinweis from './ui/UpdateHinweis'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import ReloadPrompt from './ReloadPrompt'
+import ScrollToTop from './ScrollToTop'
 
 const navPunkte: { zu: string; label: string; ende?: boolean }[] = [
   { zu: '/', label: 'Start', ende: true },
@@ -32,6 +33,7 @@ function ShuttleLogo() {
 export default function Layout() {
   return (
     <div className="flex min-h-screen flex-col bg-boden text-tinte">
+      <ScrollToTop />
       <header className="bg-court text-linie print:hidden">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-1 px-4 pt-3">
           <NavLink to="/" className="flex items-center gap-2.5 py-1">
