@@ -1,6 +1,6 @@
 /** Animation 12: Langer Aufschlag (Vorhand) — hoch und bis ganz nach hinten. */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { figurPose, grundstellung } from '../../engine/pose/figur'
+import { grundstellung } from '../../engine/pose/figur'
 import { bezierBahn } from '../../engine/pose/interpolation'
 
 export const animAufschlagLang: BewegungsAnimation = {
@@ -8,43 +8,44 @@ export const animAufschlagLang: BewegungsAnimation = {
   name: 'Aufschlag lang (Vorhand)',
   typ: 'figur',
   dauerMs: 2800,
+  kontaktT: 1300,
   netzX: 86,
   beschreibung:
     'Der Standard im Einzel: hoher Bogen bis in die hintere Aufschlagzone — der Shuttle fällt senkrecht und ist schwer anzugreifen.',
-  posen: [
+  stellungen: [
     // Schrittstellung, Gewicht hinten
-    figurPose(0, {
+    { t: 0, s: {
       huefte: { x: 40, y: 58 },
       rumpf: -92,
       oberarm: 95, unterarm: 70, schlaeger: 95,
       eindreh: 28, oberarmSeit: 10,
       obL: 102, unL: 88, obR: 70, unR: 96,
-    }),
+    } },
     // Ausholen hinten-unten
-    figurPose(700, {
+    { t: 700, s: {
       huefte: { x: 39, y: 58 },
       rumpf: -96,
       oberarm: 128, unterarm: 108, schlaeger: 145,
       eindreh: 30, oberarmSeit: 14, unterarmSeit: 8,
       obL: 100, unL: 84, obR: 66, unR: 100,
-    }),
+    } },
     // Treffpunkt vor dem Körper, Fläche öffnet nach oben
-    figurPose(1300, {
+    { t: 1300, schlag: true, s: {
       huefte: { x: 42, y: 57.5 },
       rumpf: -86,
       oberarm: 68, unterarm: 28, schlaeger: 25,
       eindreh: 22, oberarmSeit: 8, unterarmSeit: 4, schlaegerSeit: 2,
       obL: 106, unL: 90, obR: 64, unR: 94,
-    }),
+    } },
     // hoher Durchschwung über die linke Schulter
-    figurPose(1900, {
+    { t: 1900, s: {
       huefte: { x: 43, y: 57.5 },
       rumpf: -84,
       oberarm: -52, unterarm: -88, schlaeger: -118,
       eindreh: 10, oberarmSeit: -2, unterarmSeit: -8, schlaegerSeit: -10,
       obL: 108, unL: 90, obR: 62, unR: 94,
-    }),
-    figurPose(2800, grundstellung(42)),
+    } },
+    { t: 2800, s: grundstellung(42) },
   ],
   phasen: [
     {
@@ -70,9 +71,9 @@ export const animAufschlagLang: BewegungsAnimation = {
   ],
   shuttleBahn: [
     // vor dem Körper gehalten, beim Schwungbeginn fallen gelassen
-    { t: 0, x: 60, y: 48, z: 5 },
-    { t: 1080, x: 60, y: 48, z: 5 },
-    { t: 1295, x: 67, y: 56.5, z: 7 },
-    ...bezierBahn({ x: 68, y: 57 }, { x: 82, y: -12 }, { x: 97, y: 40 }, 1300, 2300, 12, { von: 7, bis: 2 }),
+    { t: 0, x: 60.45, y: 55.73, z: 5 },
+    { t: 1080, x: 60.45, y: 55.73, z: 5 },
+    { t: 1295, x: 67.45, y: 64.23, z: 7 },
+    ...bezierBahn({ x: 68.45, y: 64.73 }, { x: 82.22, y: -8.13 }, { x: 97, y: 40 }, 1300, 2300, 12, { von: 7, bis: 2 }),
   ],
 }

@@ -25,6 +25,7 @@ export function trifftSuche(uebung: Uebung, suche: string): boolean {
   const heuhaufen = [
     uebung.name,
     uebung.kurzbeschreibung,
+    ...(uebung.beschreibung ?? []),
     ...uebung.durchfuehrung,
     ...(uebung.variationen ?? []),
     ...(uebung.fehlerbilder ?? []),

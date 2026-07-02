@@ -4,7 +4,7 @@ import type { Match, Teilnehmer, Turnier, Zaehlweise } from '../../datenmodell'
 import { erzeugeRng } from './rng'
 import { bergerRunden, erzeugeRoundRobinMatches } from './roundRobin'
 import { buchholz, schweizerTabelle, standardRunden } from './schweizer'
-import { kreuzSlots, verteileGruppen, koPhaseMoeglich } from './gruppenKo'
+import { erzeugeGruppenMatches, kreuzSlots, starteKoMatches, verteileGruppen, koPhaseMoeglich } from './gruppenKo'
 import { erzeugeSpielplan, koPhaseStarten, schweizerRundeAuslosen, trageErgebnisEin, istRundeKomplett, aktuelleSchweizerRunde } from './index'
 
 const zw: Zaehlweise = {
@@ -183,6 +183,43 @@ describe('Gruppen + K.o.', () => {
       const erste = oben.includes(`${g}1`) ? 'oben' : 'unten'
       const zweite = oben.includes(`${g}2`) ? 'oben' : 'unten'
       expect(erste).not.toBe(zweite)
+    }
+  })
+
+  it('kreuzSlots defensiv: fehlender Zweitplatzierter (Einer-Gruppe) crasht nicht', () => {
+    const slots = kreuzSlots(2, [['A1'], ['B1', 'B2'], ['C1', 'C2'], ['D1', 'D2']])
+    expect(slots).toHaveLength(8)
+    const belegt = slots.filter((s): s is string => s !== undefined)
+    expect(new Set(belegt).size).toBe(7) // alle 7 Aufsteiger dabei, keiner doppelt
+    // kein Erstrunden-Paar komplett leer (sonst bliebe ein Match ewig offen)
+    for (let p = 0; 2 * p + 1 < slots.length; p++) {
+      expect(slots[2 * p] !== undefined || slots[2 * p + 1] !== undefined).toBe(true)
+    }
+  })
+
+  it('7 Teilnehmer / 4 Gruppen: K.o.-Start ohne Crash und ohne Teilnehmerverlust', () => {
+    const gruppen = verteileGruppen(teilnehmer(7, 4), 4, erzeugeRng(11))
+    expect(gruppen.some((g) => g.length < 2)).toBe(true) // Einer-Gruppe entsteht
+    // Gruppenphase deterministisch beenden: kleinere Nummer gewinnt
+    const gruppenMatches = erzeugeGruppenMatches(gruppen).map((m) => {
+      const a = Number(m.teilnehmerAId!.slice(1))
+      const b = Number(m.teilnehmerBId!.slice(1))
+      return {
+        ...m,
+        saetze: a < b ? [{ a: 11, b: 4 }] : [{ a: 4, b: 11 }],
+        siegerId: a < b ? m.teilnehmerAId! : m.teilnehmerBId!,
+        status: 'beendet' as const,
+      }
+    })
+    const ko = starteKoMatches(gruppen, gruppenMatches, zw, 2, false)
+    const runde1 = ko.filter((m) => m.runde === 1 && m.bracketTyp === 'haupt')
+    expect(runde1).toHaveLength(4) // 8er-Feld mit Freilos statt TypeError
+    const beteiligte = new Set(
+      runde1.flatMap((m) => [m.teilnehmerAId, m.teilnehmerBId]).filter(Boolean),
+    )
+    expect(beteiligte.size).toBe(7) // niemand verschwindet stillschweigend
+    for (const m of runde1) {
+      expect(m.teilnehmerAId !== undefined || m.teilnehmerBId !== undefined).toBe(true)
     }
   })
 

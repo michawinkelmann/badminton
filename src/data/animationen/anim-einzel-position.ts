@@ -14,7 +14,6 @@ export const animEinzelPosition: BewegungsAnimation = {
   dauerMs: 6400,
   beschreibung:
     'Die Mitte ist der Punkt mit den kürzesten Wegen in alle Ecken. Nach JEDEM eigenen Schlag geht es dorthin zurück — leicht zur Shuttle-Seite verschoben.',
-  posen: [],
   spieler: [
     {
       id: 'a',

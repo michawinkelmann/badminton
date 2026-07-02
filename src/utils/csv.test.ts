@@ -24,6 +24,11 @@ describe('CSV-Grundlagen', () => {
     const csv = zeilenZuCsv([['Smash; hart', 'Sagt "los"']])
     expect(csv).toContain('"Smash; hart";"Sagt ""los"""')
   })
+
+  it('neutralisiert Formel-Injection (=, +, -, @), lässt Zahlen unangetastet', () => {
+    const csv = zeilenZuCsv([['=SUM(A1)', '+HYPERLINK("x")', '@user', '-3', -3, 'B-Note']])
+    expect(csv).toContain(`'=SUM(A1);"'+HYPERLINK(""x"")";'@user;-3;-3;B-Note`)
+  })
 })
 
 describe('Einschätzungen-CSV', () => {

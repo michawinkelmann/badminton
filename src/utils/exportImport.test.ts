@@ -5,6 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import type { AppState, Einheit, Turnier, Uebung } from '../datenmodell'
 import { leererAppState } from '../datenmodell'
+import { ZAEHLWEISE_PRESETS } from '../engine/turnier/zaehlweise'
 import {
   erzeugeEinheitExport,
   erzeugeTurnierExport,
@@ -124,6 +125,19 @@ describe('Voll-Export/-Import', () => {
     const ergebnis = parseImport(json)
     expect(ergebnis.typ).toBe('voll')
     if (ergebnis.typ === 'voll') expect(ergebnis.daten).toEqual(beispielState)
+  })
+
+  it('alle Zählweise-Presets überstehen den Roundtrip — auch Zeitspiel (punkteProSatz 0)', () => {
+    for (const preset of ZAEHLWEISE_PRESETS) {
+      const zeitTurnier: Turnier = { ...turnier, id: `t-${preset.name}`, zaehlweise: { ...preset.zaehlweise } }
+      const state: AppState = { ...beispielState, turniere: [zeitTurnier] }
+      const ergebnis = parseImport(erzeugeVollExport(state))
+      expect(ergebnis.typ, `Voll-Import mit Preset „${preset.name}"`).toBe('voll')
+      if (ergebnis.typ === 'voll') expect(ergebnis.daten).toEqual(state)
+
+      const einzeln = parseImport(erzeugeTurnierExport(zeitTurnier))
+      expect(einzeln.typ, `Turnier-Import mit Preset „${preset.name}"`).toBe('turnier')
+    }
   })
 
   it('lehnt beschädigte Dateien mit verständlicher Meldung ab', () => {

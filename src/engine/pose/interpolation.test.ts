@@ -1,40 +1,125 @@
 /** Tests der Pose-Engine: Interpolation, Phasenfindung, Bézier-Sampling. */
 import { describe, expect, it } from 'vitest'
-import type { Pose } from '../../datenmodell'
-import { figurPose, grundstellung, hocke } from './figur'
+import type { FigurKeyframe } from '../../datenmodell'
+import { SEGMENT, grundstellung, hocke } from './figur'
 import {
   aktivePhasenIndex,
   bahnBisJetzt,
   bezierBahn,
+  figurPoseZuZeit,
   findeSegment,
+  fussAufsetzer,
   interpoliereBahn,
-  interpolierePose,
+  interpoliereStellung,
   smoothstep,
 } from './interpolation'
 
-const posen: Pose[] = [
-  figurPose(0, grundstellung(40)),
-  figurPose(1000, hocke(44)),
-  figurPose(2000, grundstellung(48)),
+const keyframes: FigurKeyframe[] = [
+  { t: 0, s: grundstellung(40) },
+  { t: 1000, s: hocke(44) },
+  { t: 2000, s: grundstellung(48) },
 ]
 
-describe('interpolierePose', () => {
-  it('liefert an Schlüsselzeitpunkten exakt die Schlüsselpose', () => {
-    expect(interpolierePose(posen, 0).joints.huefte.x).toBeCloseTo(40)
-    expect(interpolierePose(posen, 1000).joints.huefte.x).toBeCloseTo(44)
-    expect(interpolierePose(posen, 2000).joints.huefte.x).toBeCloseTo(48)
-  })
-
-  it('interpoliert dazwischen mit Smoothstep (Mitte = Mittelwert)', () => {
-    const mitte = interpolierePose(posen, 500)
-    expect(mitte.joints.huefte.x).toBeCloseTo(42) // smoothstep(0,5) = 0,5
-    expect(mitte.joints.huefte.y).toBeGreaterThan(57.5)
-    expect(mitte.joints.huefte.y).toBeLessThan(61.5)
+describe('interpoliereStellung', () => {
+  it('liefert an Schlüsselzeitpunkten exakt den Keyframe (inkl. aufgelöster Defaults)', () => {
+    expect(interpoliereStellung(keyframes, 0).huefte.x).toBeCloseTo(40)
+    expect(interpoliereStellung(keyframes, 1000).huefte.x).toBeCloseTo(44)
+    expect(interpoliereStellung(keyframes, 2000).huefte.x).toBeCloseTo(48)
+    // Defaults werden VOR der Interpolation aufgelöst:
+    expect(interpoliereStellung(keyframes, 0).kopf).toBeCloseTo(grundstellung(40).rumpf)
+    expect(interpoliereStellung(keyframes, 0).beinSeitL).toBeCloseTo(-4)
+    expect(interpoliereStellung(keyframes, 1000).beinSeitL).toBeCloseTo(-9) // hocke
   })
 
   it('klemmt vor Beginn und nach Ende', () => {
-    expect(interpolierePose(posen, -50).joints.huefte.x).toBeCloseTo(40)
-    expect(interpolierePose(posen, 9999).joints.huefte.x).toBeCloseTo(48)
+    expect(interpoliereStellung(keyframes, -50).huefte.x).toBeCloseTo(40)
+    expect(interpoliereStellung(keyframes, 9999).huefte.x).toBeCloseTo(48)
+  })
+
+  it('läuft an inneren Keyframes mit Tempo durch (Catmull-Rom, kein Stopp)', () => {
+    // Geschwindigkeit kurz vor/nach dem mittleren Keyframe ≈ gleich und ≠ 0
+    const kanal = (t: number) => interpoliereStellung(keyframes, t).huefte.x
+    const vVor = (kanal(1000) - kanal(990)) / 10
+    const vNach = (kanal(1010) - kanal(1000)) / 10
+    expect(vVor).toBeGreaterThan(0.001)
+    expect(vNach).toBeGreaterThan(0.001)
+    expect(vVor).toBeCloseTo(vNach, 3)
+    // Finite Differenzen: Tangente = (48 − 40) / 2000 = 0,004/ms
+    expect(vVor).toBeCloseTo(8 / 2000, 3)
+  })
+
+  it('schlag: true hält das Tempo der schnelleren Sekante am Keyframe (A2)', () => {
+    // schneller Anschwung (500 ms), langsamer Ausschwung (1500 ms)
+    const mitSchlag: FigurKeyframe[] = [
+      { t: 0, s: grundstellung(40) },
+      { t: 500, schlag: true, s: hocke(48) },
+      { t: 2000, s: grundstellung(52) },
+    ]
+    const kanal = (t: number) => interpoliereStellung(mitSchlag, t).huefte.x
+    const vAmSchlag = (kanal(505) - kanal(495)) / 10
+    const sekanteAnschwung = (48 - 40) / 500
+    // Ohne Flag würde die Bessel-Gewichtung deutlich darunter liegen
+    expect(vAmSchlag).toBeGreaterThan(sekanteAnschwung * 0.9)
+  })
+
+  it('halt: true erzwingt Tangente 0 (bewusster Stopp)', () => {
+    const mitHalt: FigurKeyframe[] = [
+      { t: 0, s: grundstellung(40) },
+      { t: 1000, halt: true, s: hocke(44) },
+      { t: 2000, s: grundstellung(48) },
+    ]
+    const kanal = (t: number) => interpoliereStellung(mitHalt, t).huefte.x
+    const vAmHalt = (kanal(1005) - kanal(995)) / 10
+    expect(Math.abs(vAmHalt)).toBeLessThan(0.0005)
+  })
+
+  it('Halte-Segmente (gleicher Wert links und rechts) bleiben exakt konstant', () => {
+    const mitHold: FigurKeyframe[] = [
+      { t: 0, s: hocke(44) },
+      { t: 500, s: hocke(44) },
+      { t: 1000, s: grundstellung(48) },
+    ]
+    for (const t of [100, 250, 400]) {
+      expect(interpoliereStellung(mitHold, t).huefte.x).toBe(44)
+      expect(interpoliereStellung(mitHold, t).oberarm).toBe(hocke(44).oberarm)
+    }
+  })
+
+  it('figurPoseZuZeit: Segmentlängen (xy) bleiben ZWISCHEN den Keyframes exakt (A1)', () => {
+    for (const t of [300, 500, 700, 1200, 1500, 1800]) {
+      const j = figurPoseZuZeit(keyframes, t).joints
+      const oberarm = Math.hypot(j.ellbogen.x - j.schulter.x, j.ellbogen.y - j.schulter.y)
+      expect(oberarm).toBeCloseTo(SEGMENT.oberarm, 6)
+      const unterschenkelL = Math.hypot(j.fussL.x - j.knieL.x, j.fussL.y - j.knieL.y)
+      expect(unterschenkelL).toBeCloseTo(SEGMENT.unterschenkel, 6)
+      const schlaeger = Math.hypot(
+        j.schlaegerKopf.x - j.handgelenk.x,
+        j.schlaegerKopf.y - j.handgelenk.y,
+      )
+      expect(schlaeger).toBeCloseTo(SEGMENT.schlaeger, 6)
+    }
+  })
+})
+
+describe('fussAufsetzer', () => {
+  it('erkennt die Landung beider Füße nach einem Sprung', () => {
+    const sprung: FigurKeyframe[] = [
+      { t: 0, s: grundstellung(40) },
+      { t: 400, s: { ...grundstellung(40), flugHoehe: 8 } },
+      { t: 800, s: grundstellung(40) },
+      { t: 1200, s: grundstellung(40) },
+    ]
+    const landungen = fussAufsetzer(sprung)
+    expect(landungen.length).toBeGreaterThanOrEqual(2) // beide Füße setzen auf
+    for (const l of landungen) {
+      expect(l.t).toBeGreaterThan(400) // erst nach dem Scheitelpunkt
+      expect(l.t).toBeLessThanOrEqual(900)
+    }
+    expect(new Set(landungen.map((l) => l.fuss))).toEqual(new Set(['L', 'R']))
+  })
+
+  it('meldet nichts, wenn die Figur am Boden bleibt', () => {
+    expect(fussAufsetzer(keyframes)).toEqual([])
   })
 })
 

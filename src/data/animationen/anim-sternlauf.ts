@@ -66,7 +66,6 @@ export const animSternlauf: BewegungsAnimation = {
   dauerMs: DAUER,
   beschreibung:
     'Das komplette Laufmuster: alle sechs Feldbereiche aus der zentralen Position. Jeder Rückweg führt über die Mitte — dort gehört der Split-Step hin.',
-  posen: [],
   spieler: [{ id: 'a', label: 'A', seite: 'a', bahn: bahn() }],
   phasen: PUNKTE.map((p, i) => ({
     vonT: i === 0 ? 0 : START_PAUSE + i * (HIN + ZURUECK),

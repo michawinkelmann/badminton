@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Match, SatzErgebnis, Turnier } from '../../datenmodell'
 import { korrekturBetroffene, pruefeSaetze } from '../../engine/turnier'
 import { useAppStore } from '../../store'
@@ -22,6 +22,13 @@ export default function ErgebnisDialog({ turnier, match, name, onClose }: Props)
   const [bestaetigung, setBestaetigung] = useState(false)
   const [wahl, setWahl] = useState<{ satz: number; seite: 'a' | 'b' }>()
   const tippZeit = useRef(0)
+  const dialogRef = useRef<HTMLDialogElement>(null)
+
+  // Natives <dialog> mit showModal(): Fokus-Trap + Escape (Muster: BestaetigungsDialog)
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (dialog && !dialog.open) dialog.showModal()
+  }, [])
 
   const auswertung = useMemo(() => pruefeSaetze(saetze, turnier.zaehlweise), [saetze, turnier.zaehlweise])
   const betroffene = useMemo(
@@ -90,13 +97,13 @@ export default function ErgebnisDialog({ turnier, match, name, onClose }: Props)
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-tinte/50 p-4"
-      role="dialog"
-      aria-modal="true"
+    <dialog
+      ref={dialogRef}
+      onClose={onClose}
+      onCancel={onClose}
       aria-label="Ergebnis eintragen"
+      className="m-auto w-full max-w-lg overflow-y-auto rounded-xl border-2 border-court bg-linie p-5 text-tinte shadow-xl backdrop:bg-tinte/50"
     >
-      <div className="max-h-full w-full max-w-lg overflow-y-auto rounded-xl border-2 border-court bg-linie p-5">
         <h2 className="schrift-display doppellinie text-lg">
           {match.feld !== undefined ? `Feld ${match.feld} · ` : ''}Ergebnis eintragen
         </h2>
@@ -281,7 +288,6 @@ export default function ErgebnisDialog({ turnier, match, name, onClose }: Props)
             Abbrechen
           </button>
         </div>
-      </div>
-    </div>
+    </dialog>
   )
 }

@@ -1,0 +1,71 @@
+=== H1: Segment-Schrumpfung (xy vs. Soll, Maximum über t) — Ziel < 2 % ===
+anim-clear             max 0.000 % (OberschenkelL @t=110) OK
+anim-drop              max 0.000 % (OberschenkelL @t=110) OK
+anim-smash             max 0.000 % (OberschenkelL @t=2140) OK
+anim-sprungsmash       max 0.000 % (UnterschenkelR @t=1010) OK
+anim-rh-clear          max 0.000 % (OberschenkelL @t=650) OK
+anim-drive-vh          max 0.000 % (OberschenkelL @t=580) OK
+anim-drive-rh          max 0.000 % (OberschenkelR @t=530) OK
+anim-unterhand-clear   max 0.000 % (Schläger @t=1130) OK
+anim-netzdrop          max 0.000 % (OberschenkelR @t=30) OK
+anim-netzlob-rh        max 0.000 % (OberschenkelR @t=30) OK
+anim-aufschlag-kurz    max 0.000 % (Schläger @t=840) OK
+anim-aufschlag-lang    max 0.000 % (OberschenkelL @t=920) OK
+anim-netzkill          max 0.000 % (OberschenkelL @t=790) OK
+anim-block             max 0.000 % (Unterarm @t=1720) OK
+anim-splitstep         max 0.000 % (OberschenkelR @t=910) OK
+anim-ausfallschritt    max 0.000 % (OberschenkelL @t=20) OK
+anim-umsprung          max 0.000 % (OberschenkelL @t=1090) OK
+
+=== H2: Kontakt-Distanz — Ziel < 3 Einheiten ===
+anim-clear             d=0.00 (≈0.0 cm) OK
+anim-drop              d=0.00 (≈0.0 cm) OK
+anim-smash             d=0.00 (≈0.0 cm) OK
+anim-sprungsmash       d=0.00 (≈0.0 cm) OK
+anim-rh-clear          d=0.00 (≈0.0 cm) OK
+anim-drive-vh          d=0.00 (≈0.0 cm) OK
+anim-drive-rh          d=0.01 (≈0.0 cm) OK
+anim-unterhand-clear   d=0.01 (≈0.0 cm) OK
+anim-netzdrop          d=0.00 (≈0.0 cm) OK
+anim-netzlob-rh        d=0.01 (≈0.0 cm) OK
+anim-aufschlag-kurz    d=0.00 (≈0.0 cm) OK
+anim-aufschlag-lang    d=0.00 (≈0.0 cm) OK
+anim-netzkill          d=0.00 (≈0.0 cm) OK
+anim-block             d=0.00 (≈0.0 cm) OK
+
+=== H4: Schlägerkopf-Tempo am Kontakt — Ziel > 50 % vom Peak im Schlagfenster (±300 ms) ===
+anim-clear             Kontakt 65 % vom Fenster-Peak (@t=1370, Versatz -80 ms) | global 65 % OK
+anim-drop              Kontakt 63 % vom Fenster-Peak (@t=1390, Versatz -90 ms) | global 63 % OK
+anim-smash             Kontakt 58 % vom Fenster-Peak (@t=1320, Versatz -80 ms) | global 58 % OK
+anim-sprungsmash       Kontakt 84 % vom Fenster-Peak (@t=1490, Versatz 190 ms) | global 84 % OK
+anim-rh-clear          Kontakt 56 % vom Fenster-Peak (@t=1770, Versatz 270 ms) | global 56 % OK
+anim-drive-vh          Kontakt 72 % vom Fenster-Peak (@t=690, Versatz -110 ms) | global 71 % OK
+anim-drive-rh          Kontakt 58 % vom Fenster-Peak (@t=690, Versatz -110 ms) | global 46 % OK
+anim-unterhand-clear   Kontakt 66 % vom Fenster-Peak (@t=1230, Versatz -170 ms) | global 66 % OK
+anim-netzdrop          Kontakt 76 % vom Fenster-Peak (@t=1570, Versatz 160 ms) | global 42 % OK
+anim-netzlob-rh        Kontakt 64 % vom Fenster-Peak (@t=1560, Versatz 100 ms) | global 64 % OK
+anim-aufschlag-kurz    Kontakt 70 % vom Fenster-Peak (@t=1000, Versatz -150 ms) | global 70 % OK
+anim-aufschlag-lang    Kontakt 90 % vom Fenster-Peak (@t=1480, Versatz 180 ms) | global 90 % OK
+anim-netzkill          Kontakt 95 % vom Fenster-Peak (@t=780, Versatz 50 ms) | global 95 % OK
+anim-block             Kontakt 85 % vom Fenster-Peak (@t=790, Versatz -160 ms) | global 85 % OK
+
+=== H7: Fußbodenkontakt (tieferer Fuß vs. BODEN_Y) — Ziel 0 ± 0,5 außer Flug ===
+anim-clear             Abweichung ±0.000 OK
+anim-drop              Abweichung ±0.000 OK
+anim-smash             Abweichung ±0.000 OK
+anim-sprungsmash       Abweichung ±0.000 | Flug bis 15.2 OK
+anim-rh-clear          Abweichung ±0.000 OK
+anim-drive-vh          Abweichung ±0.000 OK
+anim-drive-rh          Abweichung ±0.000 OK
+anim-unterhand-clear   Abweichung ±0.000 OK
+anim-netzdrop          Abweichung ±0.000 OK
+anim-netzlob-rh        Abweichung ±0.000 OK
+anim-aufschlag-kurz    Abweichung ±0.000 OK
+anim-aufschlag-lang    Abweichung ±0.000 OK
+anim-netzkill          Abweichung ±0.000 OK
+anim-block             Abweichung ±0.000 OK
+anim-splitstep         Abweichung ±0.000 | Flug bis 7.1 OK
+anim-ausfallschritt    Abweichung ±0.000 OK
+anim-umsprung          Abweichung ±0.000 | Flug bis 12.0 OK
+
+ALLE ZIELE ERREICHT ✓

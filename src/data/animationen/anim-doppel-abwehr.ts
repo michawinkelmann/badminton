@@ -14,7 +14,6 @@ export const animDoppelAbwehr: BewegungsAnimation = {
   dauerMs: 6600,
   beschreibung:
     'In der Abwehr steht das Paar nebeneinander und teilt das Feld in zwei Hälften. Der Wechsel zurück in den Angriff passiert in dem Moment, in dem der Gegner heben muss.',
-  posen: [],
   spieler: [
     {
       id: 'b1',

@@ -12,6 +12,8 @@ export const VIER_NAMEN = NEUN_NAMEN.slice(0, 4)
 interface TurnierOptionen {
   name: string
   teilnehmer: string[]
+  /** Format-Kachel, z. B. /Gruppen \+ K\.o\./ oder /Schweizer System/ (Standard: K.o.). */
+  format?: RegExp
   /** Zählweise-Preset-Button, z. B. 'Schule 1×15' (Best-of-1 → schnelle Tests). */
   preset?: string
   spielUmPlatz3?: boolean
@@ -21,6 +23,7 @@ interface TurnierOptionen {
 export async function turnierAnlegen(page: Page, o: TurnierOptionen): Promise<string> {
   await geheZu(page, '/turniere/neu')
   await page.getByLabel('Name', { exact: true }).fill(o.name)
+  if (o.format) await page.getByRole('button', { name: o.format }).click()
   if (o.preset) await page.getByRole('button', { name: o.preset }).click()
   if (o.spielUmPlatz3) await page.getByRole('checkbox', { name: 'Spiel um Platz 3' }).check()
   await page.getByLabel(/Schnelleingabe/).fill(o.teilnehmer.join('\n'))
@@ -113,4 +116,38 @@ export async function spieleAlleBracketSpiele(
 /** Zähler aus der Einstellungen-Datenübersicht (dt/dd-Paare) lesen. */
 export function zaehlerWert(page: Page, label: string): Locator {
   return page.locator(`dt:text-is("${label}") + dd`)
+}
+
+/**
+ * Offene (klickbare, noch ergebnislose) Spiele einer MatchListe innerhalb von
+ * `bereich`: enabled-Buttons ohne Satzstand (":") und ohne Beendet-Haken.
+ * Feld-Badges („Feld 1") stören nicht — gefiltert wird über ":" statt Ziffern.
+ */
+export function offeneListenSpiele(bereich: Locator): Locator {
+  return bereich
+    .locator('button:enabled')
+    .filter({ hasText: '–' }) // Namens-Trenner der MatchListe (schließt z. B. „Runde 2 auslosen" aus)
+    .filter({ hasNotText: /:|✓/ })
+}
+
+/**
+ * Alle offenen Spiele in `bereich` mit `punkte`:0 (Best-of-1) für Seite A
+ * eintragen — für Gruppenphase, Schweizer Runden, Jeder-gegen-Jeden.
+ */
+export async function spieleAlleListenSpiele(
+  page: Page,
+  bereich: Locator,
+  punkte: number,
+): Promise<number> {
+  let gespielt = 0
+  for (let i = 0; i < 30; i++) {
+    const offene = offeneListenSpiele(bereich)
+    if ((await offene.count()) === 0) break
+    await offene.first().click()
+    const dialog = ergebnisDialog(page)
+    await punkteTippen(dialog, 0, 0, punkte)
+    await ergebnisSpeichern(dialog)
+    gespielt++
+  }
+  return gespielt
 }

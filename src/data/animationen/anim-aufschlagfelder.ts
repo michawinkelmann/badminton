@@ -10,7 +10,6 @@ export const animAufschlagfelder: BewegungsAnimation = {
   umschaltbar: true,
   beschreibung:
     'Wohin muss der Aufschlag? Einzel: lang und schmal. Doppel: kurz und breit. Aufgeschlagen wird immer diagonal — von rechts bei gerader, von links bei ungerader eigener Punktzahl.',
-  posen: [],
   spieler: [
     {
       id: 's',

@@ -1,6 +1,6 @@
 /** Animation 15: Split-Step — der Auftakthüpfer, Timing ist alles. */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { ausfallschritt, figurPose, grundstellung, hocke } from '../../engine/pose/figur'
+import { ausfallschritt, grundstellung, hocke } from '../../engine/pose/figur'
 
 export const animSplitstep: BewegungsAnimation = {
   id: 'anim-splitstep',
@@ -9,29 +9,30 @@ export const animSplitstep: BewegungsAnimation = {
   dauerMs: 2200,
   beschreibung:
     'Der kleine beidbeinige Hüpfer vor jedem gegnerischen Schlag. Die Landung fällt genau in den Schlagmoment — daraus entsteht der explosive erste Schritt.',
-  posen: [
-    figurPose(0, grundstellung(44)),
+  stellungen: [
+    { t: 0, s: grundstellung(44) },
     // leichtes Absinken (Vorspannung)
-    figurPose(500, hocke(44)),
+    { t: 500, s: hocke(44) },
     // flacher Absprung: ganze Figur hebt 2–3 cm
-    figurPose(720, {
+    { t: 720, s: {
       huefte: { x: 44, y: 53.5 },
       rumpf: -88,
       oberarm: 42, unterarm: -30, schlaeger: -38,
       obL: 96, unL: 90, obR: 80, unR: 92,
       eindreh: 6, beinSeitL: -5, beinSeitR: 5,
-    }),
+      flugHoehe: 1.2,
+    } },
     // breite, federnde Landung
-    figurPose(950, {
+    { t: 950, s: {
       huefte: { x: 44, y: 62.5 },
       rumpf: -84,
       oberarm: 40, unterarm: -30, schlaeger: -40,
       obL: 118, unL: 70, obR: 54, unR: 112,
       eindreh: 6, beinSeitL: -15, beinSeitR: 15,
-    }),
+    } },
     // explosiver erster Schritt Richtung Netz
-    figurPose(1400, ausfallschritt(51, -1)),
-    figurPose(2200, grundstellung(44)),
+    { t: 1400, s: ausfallschritt(51, -1) },
+    { t: 2200, s: grundstellung(44) },
   ],
   phasen: [
     {

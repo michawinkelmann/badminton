@@ -4,8 +4,9 @@
 
 ## E2E-Smoke-Test (Playwright) — ✅ umgesetzt
 
-Die 300+ Vitest-Tests prüfen Engine und Datenlogik; die Playwright-Smoke-Tests
-(`e2e/smoke.spec.ts`) klicken zusätzlich die kritischen Pfade einmal komplett durch:
+Die 450+ Vitest-Tests prüfen Engine und Datenlogik; die Playwright-Smoke-Tests
+(`e2e/smoke.spec.ts` + `e2e/formate.spec.ts`) klicken zusätzlich die kritischen
+Pfade einmal komplett durch:
 
 1. **Turnier komplett:** K.o. mit 9 Namen per Schnelleingabe + Spiel um Platz 3 →
    Spielplan → alle Ergebnisse über den ±/Schnellwahl-Dialog → Endstand/Podium →
@@ -18,6 +19,10 @@ Die 300+ Vitest-Tests prüfen Engine und Datenlogik; die Playwright-Smoke-Tests
    Import derselben Datei → alle neun Zähler in den Einstellungen stimmen wieder.
 5. **Training:** Einheit im Builder (3 Übungen) → Druckansicht rendert → Gruppe loggen
    → Kennzahlen/Volumen im Profil ändern sich → Einschätzung speichern → Radar erscheint.
+6. **Gruppen + K.o.** (`formate.spec.ts`): 7 Teilnehmer / 2 Gruppen → alle 9 Gruppenspiele
+   → „K.o.-Phase starten" mit Bestätigung → Kreuz-Bracket mit 2 offenen Halbfinals.
+7. **Schweizer System** (`formate.spec.ts`): 5 Teilnehmer → Runde 1 (2 Spiele + Freilos)
+   → „Runde 2 auslosen" → neue Paarungen, Tabelle springt auf Runde 2/3, Reload persistiert.
 
 **Verwendung:**
 

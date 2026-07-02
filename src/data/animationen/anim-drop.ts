@@ -1,6 +1,6 @@
 /** Animation 2: Überkopf-Drop — gleiche Ausholbewegung wie der Clear (Täuschung!). */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { ausholungUeberkopf, figurPose, grundstellung, treffpunktHoch } from '../../engine/pose/figur'
+import { ausholungUeberkopf, grundstellung, treffpunktHoch } from '../../engine/pose/figur'
 import { bezierBahn } from '../../engine/pose/interpolation'
 
 export const animDrop: BewegungsAnimation = {
@@ -8,28 +8,29 @@ export const animDrop: BewegungsAnimation = {
   name: 'Überkopf-Drop',
   typ: 'figur',
   dauerMs: 2800,
+  kontaktT: 1480,
   beschreibung:
     'Sieht aus wie ein Clear — wird aber kurz hinter dem Netz langsam: Das Tempo wird erst im Treffpunkt herausgenommen, nicht im Ausholen.',
-  posen: [
-    figurPose(0, grundstellung(44)),
-    figurPose(700, {
+  stellungen: [
+    { t: 0, s: grundstellung(44) },
+    { t: 700, s: {
       huefte: { x: 43, y: 58 },
       rumpf: -96,
       oberarm: -128, unterarm: -68, schlaeger: -58,
       obL: 97, unL: 82, obR: 68, unR: 99,
       eindreh: 72, oberarmSeit: 4,
-    }),
-    figurPose(1300, ausholungUeberkopf(42)),
-    figurPose(1480, treffpunktHoch(45, -76)),
+    } },
+    { t: 1300, s: ausholungUeberkopf(42) },
+    { t: 1480, schlag: true, s: treffpunktHoch(45, -76) },
     // weicher, kurzer Ausschwung — kein Durchschlagen
-    figurPose(1850, {
+    { t: 1850, s: {
       huefte: { x: 46, y: 57.5 },
       rumpf: -86,
       oberarm: -40, unterarm: -18, schlaeger: 2,
       eindreh: 15, oberarmSeit: 8,
       obL: 102, unL: 84, obR: 70, unR: 98,
-    }),
-    figurPose(2800, grundstellung(45)),
+    } },
+    { t: 2800, s: grundstellung(45) },
   ],
   phasen: [
     {
@@ -54,7 +55,7 @@ export const animDrop: BewegungsAnimation = {
     },
   ],
   shuttleBahn: [
-    ...bezierBahn({ x: 98, y: 22 }, { x: 78, y: -2 }, { x: 53, y: 7 }, 650, 1460, 10, { von: 4, bis: 9 }),
-    ...bezierBahn({ x: 53, y: 7 }, { x: 68, y: 6 }, { x: 82, y: 34 }, 1500, 2200, 10, { von: 9, bis: 5 }),
+    ...bezierBahn({ x: 98, y: 22 }, { x: 80.06, y: 0.59 }, { x: 57.12, y: 12.19 }, 650, 1480, 10, { von: 4, bis: 9 }),
+    ...bezierBahn( { x: 57.12, y: 12.19 }, { x: 70.06, y: 8.59 }, { x: 82, y: 34 }, 1480, 2200, 10, { von: 9, bis: 5 }),
   ],
 }

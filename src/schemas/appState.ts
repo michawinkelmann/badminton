@@ -168,7 +168,8 @@ export const ProgrammZuweisungSchema = z.object({
 export const ZaehlweiseSchema = z.object({
   modus: z.enum(['punkte', 'zeit']),
   saetzeZumSieg: z.union([z.literal(1), z.literal(2)]),
-  punkteProSatz: z.number().int().positive(),
+  /** 0 erlaubt: Zeitspiel-Preset zählt keine festen Satzpunkte (§9.1). */
+  punkteProSatz: z.number().int().min(0),
   verlaengerung: z.boolean(),
   maxPunkte: z.number().int().positive(),
   zeitspielMin: z.number().positive().optional(),

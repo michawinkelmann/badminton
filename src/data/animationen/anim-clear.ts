@@ -4,13 +4,7 @@
  * Körper, Arm gestreckt — Lehrtexte = Trainer-Knackpunkte.
  */
 import type { BewegungsAnimation } from '../../datenmodell'
-import {
-  ausholungUeberkopf,
-  ausschwung,
-  figurPose,
-  grundstellung,
-  treffpunktHoch,
-} from '../../engine/pose/figur'
+import { ausholungUeberkopf, ausschwung, grundstellung, treffpunktHoch } from '../../engine/pose/figur'
 import { bezierBahn } from '../../engine/pose/interpolation'
 
 export const animClear: BewegungsAnimation = {
@@ -18,13 +12,14 @@ export const animClear: BewegungsAnimation = {
   name: 'Vorhand-Überkopf-Clear',
   typ: 'figur',
   dauerMs: 2800,
+  kontaktT: 1450,
   beschreibung:
     'Der Grundschlag des Badmintons: hoch und weit zur gegnerischen Grundlinie. Kraft entsteht aus der Kette Beine–Hüfte–Rumpf–Arm–Handgelenk.',
-  posen: [
-    figurPose(0, grundstellung(44)),
+  stellungen: [
+    { t: 0, s: grundstellung(44) },
     // Auftakt: eindrehen, Gewicht aufs hintere Bein, Arm hebt
     // Klassische Vorbereitung: Ellbogen hoch, Schlägerkopf zeigt nach OBEN
-    figurPose(700, {
+    { t: 700, s: {
       huefte: { x: 43, y: 58 },
       rumpf: -96,
       oberarm: -128,
@@ -33,11 +28,11 @@ export const animClear: BewegungsAnimation = {
       obL: 97, unL: 82,
       obR: 68, unR: 99,
       eindreh: 72, oberarmSeit: 4,
-    }),
-    figurPose(1300, ausholungUeberkopf(42)),
-    figurPose(1450, treffpunktHoch(45, -78)),
-    figurPose(1950, ausschwung(47)),
-    figurPose(2800, grundstellung(45)),
+    } },
+    { t: 1300, s: ausholungUeberkopf(42) },
+    { t: 1450, schlag: true, s: treffpunktHoch(45, -78) },
+    { t: 1950, s: ausschwung(47) },
+    { t: 2800, s: grundstellung(45) },
   ],
   phasen: [
     {
@@ -70,7 +65,7 @@ export const animClear: BewegungsAnimation = {
     },
   ],
   shuttleBahn: [
-    ...bezierBahn({ x: 98, y: 22 }, { x: 78, y: -2 }, { x: 53, y: 6 }, 650, 1430, 10, { von: 4, bis: 9 }),
-    ...bezierBahn({ x: 53, y: 6 }, { x: 78, y: -8 }, { x: 99, y: 14 }, 1470, 2100, 10, { von: 9, bis: 4 }),
+    ...bezierBahn({ x: 98, y: 22 }, { x: 79.5, y: 0.92 }, { x: 55.99, y: 11.84 }, 650, 1450, 10, { von: 4, bis: 9 }),
+    ...bezierBahn( { x: 55.99, y: 11.84 }, { x: 79.5, y: -5.08 }, { x: 99, y: 14 }, 1450, 2100, 10, { von: 9, bis: 4 }),
   ],
 }

@@ -1,6 +1,6 @@
 /** Animation 16: Ausfallschritt zum Netz — Lunge mit Knie über dem Fuß. */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { ausfallschritt, figurPose, grundstellung } from '../../engine/pose/figur'
+import { ausfallschritt, grundstellung } from '../../engine/pose/figur'
 
 export const animAusfallschritt: BewegungsAnimation = {
   id: 'anim-ausfallschritt',
@@ -10,29 +10,29 @@ export const animAusfallschritt: BewegungsAnimation = {
   netzX: 84,
   beschreibung:
     'Der letzte Schritt ans Netz ist immer ein langer Ausfallschritt: Er bremst die Bewegung, schützt das Knie und bringt Reichweite.',
-  posen: [
-    figurPose(0, grundstellung(36)),
+  stellungen: [
+    { t: 0, s: grundstellung(36) },
     // Anlauf mit kleinen Schritten
-    figurPose(700, {
+    { t: 700, s: {
       huefte: { x: 46, y: 59.5 },
       rumpf: -82,
-      oberarm: 18, unterarm: -16, schlaeger: -10,
+      oberarm: 18, unterarm: -16, schlaeger: 40,
       eindreh: 14, oberarmSeit: 8,
       obL: 114, unL: 94, obR: 52, unR: 94,
-    }),
-    // tiefer Ausfallschritt
-    figurPose(1200, ausfallschritt(56, 2)),
+    } },
+    // tiefer Ausfallschritt — Arm tief nach vorn-unten, Schlägerkopf bleibt vor dem Netz
+    { t: 1200, s: { ...ausfallschritt(56, 2), oberarm: 45, unterarm: 10, schlaeger: 78 } },
     // Position halten (Lehrmoment)
-    figurPose(1550, ausfallschritt(56, 2)),
-    // aktiv zurückdrücken
-    figurPose(2000, {
+    { t: 1550, s: { ...ausfallschritt(56, 2), oberarm: 45, unterarm: 10, schlaeger: 78 } },
+    // aktiv zurückdrücken — Schläger erst tief lassen, dann heben (bleibt vorm Netz)
+    { t: 2000, s: {
       huefte: { x: 47, y: 59.5 },
       rumpf: -86,
-      oberarm: 30, unterarm: -28, schlaeger: -34,
+      oberarm: 20, unterarm: -40, schlaeger: 30,
       eindreh: 14, oberarmSeit: 8,
       obL: 112, unL: 92, obR: 54, unR: 96,
-    }),
-    figurPose(2600, grundstellung(36)),
+    } },
+    { t: 2600, s: grundstellung(36) },
   ],
   phasen: [
     {

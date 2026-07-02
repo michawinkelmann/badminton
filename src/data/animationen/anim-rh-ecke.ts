@@ -9,7 +9,6 @@ export const animRhEcke: BewegungsAnimation = {
   dauerMs: 4000,
   beschreibung:
     'Die tiefe Rückhand-Ecke ist die schwächste Zone — wer den Laufweg leicht außen herum legt, kann statt der Rückhand die starke Vorhand spielen.',
-  posen: [],
   spieler: [
     {
       id: 'a',

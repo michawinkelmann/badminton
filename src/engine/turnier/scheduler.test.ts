@@ -1,7 +1,8 @@
 /** Tests: Felder-Scheduler — Wartezeit-Fairness, keine Doppel-Einsätze. */
 import { describe, expect, it } from 'vitest'
-import type { Match } from '../../datenmodell'
+import type { Match, Turnier } from '../../datenmodell'
 import { geschaetztesEnde, naechsteSpiele, spielbereiteMatches, wartezeitMin, weiseFelderZu } from './scheduler'
+import { setzeZwischenstand } from './index'
 
 let nr = 0
 function offen(a: string, b: string, extras: Partial<Match> = {}): Match {
@@ -74,6 +75,31 @@ describe('Scheduler (§9.1)', () => {
       offen('A', 'B'),
     ]
     expect(weiseFelderZu(matches, 2)).toHaveLength(1)
+  })
+})
+
+describe('Zwischenstand & Scheduler', () => {
+  function turnierMit(matches: Match[]): Turnier {
+    return {
+      id: 't1', name: 'T', datum: '2026-06-12', disziplin: 'einzel', format: 'jeder_gegen_jeden',
+      zaehlweise: { modus: 'punkte', saetzeZumSieg: 1, punkteProSatz: 11, verlaengerung: false, maxPunkte: 11 },
+      felderAnzahl: 2, teilnehmer: [{ id: 'A', name: 'A' }, { id: 'B', name: 'B' }],
+      matches, config: {}, status: 'laufend',
+    }
+  }
+
+  it('Zwischenstand ohne Feld: Match bleibt offen und damit spielbereit', () => {
+    const m = offen('A', 'B')
+    const matches = setzeZwischenstand(turnierMit([m]), m.id, [{ a: 5, b: 3 }])
+    expect(matches[0]!.status).toBe('offen')
+    expect(matches[0]!.saetze).toEqual([{ a: 5, b: 3 }])
+    expect(spielbereiteMatches(matches).map((x) => x.id)).toContain(m.id)
+  })
+
+  it('Zwischenstand mit Feld: Match gilt als laufend', () => {
+    const m = offen('A', 'B', { feld: 1 })
+    const matches = setzeZwischenstand(turnierMit([m]), m.id, [{ a: 5, b: 3 }])
+    expect(matches[0]!.status).toBe('laufend')
   })
 })
 

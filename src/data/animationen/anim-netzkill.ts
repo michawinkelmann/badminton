@@ -1,6 +1,5 @@
 /** Animation 13: Töten am Netz (Netz-Kill) — kurzer Stich statt Ausholen. */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { figurPose } from '../../engine/pose/figur'
 import { bezierBahn } from '../../engine/pose/interpolation'
 
 export const animNetzkill: BewegungsAnimation = {
@@ -8,49 +7,50 @@ export const animNetzkill: BewegungsAnimation = {
   name: 'Töten am Netz (Netz-Kill)',
   typ: 'figur',
   dauerMs: 2000,
+  kontaktT: 690,
   netzX: 74,
   beschreibung:
     'Zu hohe Bälle über der Kante werden sofort nach unten getötet. Die Kunst: maximal kurzer Schlag — sonst droht die Netzberührung (Fehler!).',
-  posen: [
+  stellungen: [
     // Bereit am Netz: Schlägerkopf über Kantenhöhe
-    figurPose(0, {
-      huefte: { x: 40, y: 58 },
+    { t: 0, s: {
+      huefte: { x: 38.5, y: 58 },
       rumpf: -86,
       oberarm: -32, unterarm: -16, schlaeger: -24,
       obL: 102, unL: 84, obR: 66, unR: 100,
       eindreh: 6, oberarmSeit: 8, unterarmSeit: 6, schlaegerSeit: 4,
-    }),
+    } },
     // minimales Laden (nur Handgelenk)
-    figurPose(700, {
-      huefte: { x: 40, y: 58 },
+    { t: 700, schlag: true, s: {
+      huefte: { x: 38.5, y: 58 },
       rumpf: -86,
       oberarm: -30, unterarm: -20, schlaeger: -44,
       eindreh: 6, oberarmSeit: 8, unterarmSeit: 6, schlaegerSeit: 4,
       obL: 102, unL: 84, obR: 66, unR: 100,
-    }),
+    } },
     // Stich: kurzer Schlag nach vorn-unten, Bewegung stoppt vor dem Netz
-    figurPose(950, {
-      huefte: { x: 42, y: 58.5 },
+    { t: 950, halt: true, s: {
+      huefte: { x: 40.5, y: 58.5 },
       rumpf: -82,
-      oberarm: -8, unterarm: 10, schlaeger: 45,
+      oberarm: -20, unterarm: 70, schlaeger: 85,
       eindreh: 8, oberarmSeit: 8, unterarmSeit: 6, schlaegerSeit: 4,
       obL: 106, unL: 86, obR: 60, unR: 96,
-    }),
+    } },
     // sofort wieder hoch
-    figurPose(1400, {
-      huefte: { x: 40, y: 58 },
+    { t: 1400, s: {
+      huefte: { x: 38.5, y: 58 },
       rumpf: -86,
       oberarm: -32, unterarm: -16, schlaeger: -24,
       obL: 102, unL: 84, obR: 66, unR: 100,
       eindreh: 6, oberarmSeit: 8, unterarmSeit: 6, schlaegerSeit: 4,
-    }),
-    figurPose(2000, {
-      huefte: { x: 40, y: 58 },
+    } },
+    { t: 2000, s: {
+      huefte: { x: 38.5, y: 58 },
       rumpf: -86,
       oberarm: -32, unterarm: -16, schlaeger: -24,
       obL: 102, unL: 84, obR: 66, unR: 100,
       eindreh: 6, oberarmSeit: 8, unterarmSeit: 6, schlaegerSeit: 4,
-    }),
+    } },
   ],
   phasen: [
     {
@@ -70,7 +70,9 @@ export const animNetzkill: BewegungsAnimation = {
     },
   ],
   shuttleBahn: [
-    ...bezierBahn({ x: 93, y: 20 }, { x: 86, y: 21 }, { x: 72, y: 27 }, 400, 790, 10, { von: 3, bis: 9.5 }),
-    ...bezierBahn({ x: 72, y: 27 }, { x: 78, y: 30 }, { x: 84, y: 68 }, 790, 1050, 10, { von: 9.5, bis: 5 }),
+    ...bezierBahn({ x: 93, y: 20 }, { x: 83.61, y: -15.1 }, { x: 67.18, y: 25.11 }, 400, 690, 10, { von: 3, bis: 9.5 }),
+    // Kill: flach über die Kante, direkt dahinter steil nach unten
+    ...bezierBahn({ x: 67.18, y: 25.11 }, { x: 70.5, y: 26.3 }, { x: 74.5, y: 29 }, 690, 810, 8, { von: 9.5, bis: 8 }),
+    ...bezierBahn({ x: 74.5, y: 29 }, { x: 78, y: 38 }, { x: 84, y: 68 }, 810, 1050, 8, { von: 8, bis: 5 }),
   ],
 }

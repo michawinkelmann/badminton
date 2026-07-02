@@ -298,7 +298,10 @@ export default function EinheitenBuilder() {
     }
     einheitSpeichern(einheit)
     setMeldung('Gespeichert.')
-    if (!vorhandene) navigate(`/einheiten/${einheit.id}`, { replace: true })
+    // Auf die gespeicherte ID navigieren, solange die URL noch keine eigene
+    // Einheit zeigt (auch beim Speichern einer Vorlagen-Kopie) — sonst legt
+    // jedes weitere „Speichern" eine neue Kopie an.
+    if (!gespeicherte) navigate(`/einheiten/${einheit.id}`, { replace: true })
   }
 
   return (

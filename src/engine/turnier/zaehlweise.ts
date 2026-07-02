@@ -23,7 +23,8 @@ export function satzSieger(satz: SatzErgebnis, zw: Zaehlweise): Seite | undefine
     beendet =
       (max === zw.punkteProSatz && max - min >= 2) ||
       (max > zw.punkteProSatz && max < zw.maxPunkte && max - min === 2) ||
-      (max === zw.maxPunkte && max > min)
+      // Kappung: erreichbar nur aus der Verlängerung heraus → Abstand 1–2
+      (max === zw.maxPunkte && max - min >= 1 && max - min <= 2)
   } else {
     beendet = max === zw.punkteProSatz && max > min
   }

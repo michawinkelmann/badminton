@@ -27,6 +27,7 @@ import {
   erzeugeSpielplan,
   koPhaseStarten as engineKoStarten,
   gruppenphaseFertig,
+  istRundeKomplett,
   schweizerRundeAuslosen as engineSchweizerRunde,
   schweizerRundenzahl,
   setzeZwischenstand,
@@ -179,6 +180,14 @@ export const useAppStore = create<AppStore>()(
             ...g,
             mitgliederIds: g.mitgliederIds.filter((m) => m !== id),
           })),
+          // Keine verwaisten Referenzen hinterlassen (wie gruppeLoeschen):
+          zuweisungen: s.zuweisungen.filter(
+            (z) => !(z.zielTyp === 'profil' && z.zielId === id),
+          ),
+          einschaetzungen: s.einschaetzungen.filter((e) => e.profilId !== id),
+          logs: s.logs
+            .map((l) => ({ ...l, profilIds: l.profilIds.filter((p) => p !== id) }))
+            .filter((l) => l.profilIds.length > 0),
         })),
 
       /* ---------- Gruppen ---------- */
@@ -462,6 +471,10 @@ export const useAppStore = create<AppStore>()(
       turnierSchweizerRundeAuslosen: (turnierId) => {
         const t = get().turniere.find((x) => x.id === turnierId)
         if (!t) return
+        // Guard gegen Doppel-Auslosung: nur wenn die aktuelle Runde komplett
+        // ist UND die Rundenzahl noch nicht erreicht wurde (wie die UI-Bedingung).
+        const runde = aktuelleSchweizerRunde(t.matches)
+        if (!istRundeKomplett(t.matches, runde) || runde >= schweizerRundenzahl(t)) return
         const matches = engineSchweizerRunde(t)
         set((s) => ({
           turniere: s.turniere.map((x) =>

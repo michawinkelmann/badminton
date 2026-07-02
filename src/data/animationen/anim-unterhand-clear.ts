@@ -1,6 +1,6 @@
 /** Animation 8: Unterhand-Clear (Lob aus der Abwehr) — hoch und weit befreien. */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { ausfallschritt, figurPose, grundstellung } from '../../engine/pose/figur'
+import { ausfallschritt, grundstellung } from '../../engine/pose/figur'
 import { bezierBahn } from '../../engine/pose/interpolation'
 
 export const animUnterhandClear: BewegungsAnimation = {
@@ -8,38 +8,39 @@ export const animUnterhandClear: BewegungsAnimation = {
   name: 'Unterhand-Clear (Lob)',
   typ: 'figur',
   dauerMs: 2400,
+  kontaktT: 1400,
   netzX: 86,
   beschreibung:
     'Die Befreiung: tiefe Bälle mit langem Ausfallschritt erlaufen und hoch zur Grundlinie spielen — Höhe kauft Zeit für den Rückweg.',
-  posen: [
-    figurPose(0, grundstellung(38)),
+  stellungen: [
+    { t: 0, s: grundstellung(38) },
     // Anlauf, Arm senkt sich
-    figurPose(600, {
+    { t: 600, s: {
       huefte: { x: 46, y: 60 },
       rumpf: -82,
       oberarm: 58, unterarm: 48, schlaeger: 78,
       eindreh: 18, oberarmSeit: 8,
       obL: 112, unL: 92, obR: 52, unR: 96,
-    }),
+    } },
     // Ausfallschritt, Ausholen unten-hinten
-    figurPose(1000, {
-      ...ausfallschritt(54, 1),
+    { t: 1000, s: {
+      ...ausfallschritt(52.5, 1),
       oberarm: 118, unterarm: 92, schlaeger: 128,
-    }),
+    } },
     // Treffpunkt vor dem Knie, Fläche öffnet nach oben
-    figurPose(1400, {
-      ...ausfallschritt(55, 1),
+    { t: 1400, schlag: true, s: {
+      ...ausfallschritt(53.5, 1),
       oberarm: 52, unterarm: 12, schlaeger: -58,
-    }),
+    } },
     // hoher Ausschwung
-    figurPose(1800, {
+    { t: 1800, s: {
       huefte: { x: 52, y: 60 },
       rumpf: -82,
       oberarm: -16, unterarm: -50, schlaeger: -78,
       eindreh: 14, oberarmSeit: 10,
       obL: 124, unL: 100, obR: 46, unR: 90,
-    }),
-    figurPose(2400, grundstellung(40)),
+    } },
+    { t: 2400, s: grundstellung(40) },
   ],
   phasen: [
     {
@@ -64,7 +65,7 @@ export const animUnterhandClear: BewegungsAnimation = {
     },
   ],
   shuttleBahn: [
-    ...bezierBahn({ x: 94, y: 12 }, { x: 88, y: 18 }, { x: 82, y: 44 }, 900, 1380, 8, { von: 5, bis: 8 }),
-    ...bezierBahn({ x: 82, y: 44 }, { x: 88, y: -8 }, { x: 98, y: 6 }, 1420, 2100, 10, { von: 8, bis: 4 }),
+    ...bezierBahn({ x: 94, y: 12 }, { x: 88.1, y: -2.91 }, { x: 82.2, y: 49.25 }, 900, 1400, 8, { von: 5, bis: 8 }),
+    ...bezierBahn( { x: 82.2, y: 49.25 }, { x: 88.1, y: -5.38 }, { x: 98, y: 6 }, 1400, 2100, 10, { von: 8, bis: 4 }),
   ],
 }

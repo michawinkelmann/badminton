@@ -93,6 +93,20 @@ describe('K.o.: Freilose & Struktur (3, 5, 8, 9, 16, 17 Teilnehmer)', () => {
     })
   }
 
+  it('3 Teilnehmer + Spiel um Platz 3: Turnier ist abschließbar, Platzierungen korrekt', () => {
+    const t = durchspielen(koTurnier(3, 2))
+    // Alle Matches beendet — auch Platz 3, obwohl nur EIN Halbfinal-Verlierer existiert
+    expect(t.matches.every((m) => m.status === 'beendet')).toBe(true)
+    const finale = t.matches.find((m) => m.bracketTyp === 'haupt' && m.runde === 2)!
+    expect(finale.siegerId).toBe('t1')
+    const zweiter = finale.siegerId === finale.teilnehmerAId ? finale.teilnehmerBId : finale.teilnehmerAId
+    expect(zweiter).toBe('t2')
+    const platz3 = t.matches.find((m) => m.bracketTyp === 'platz3')!
+    expect(platz3.status).toBe('beendet')
+    expect(platz3.siegerId).toBe('t3') // Freilos: einziger Halbfinal-Verlierer wird Dritter
+    expect(platz3.saetze).toHaveLength(0)
+  })
+
   it('Sieger wird korrekt propagiert, Platz 3 bekommt die Halbfinal-Verlierer', () => {
     const t = durchspielen(koTurnier(8, 4))
     const finale = t.matches.find((m) => m.bracketTyp === 'haupt' && m.runde === 3)!

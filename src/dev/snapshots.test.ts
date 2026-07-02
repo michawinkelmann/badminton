@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import type { BewegungsAnimation, Pose } from '../datenmodell'
 import { BODEN_Y, FRONT_MITTE, figurTeile, frontTeile } from '../engine/pose/figur'
-import { bahnBisJetzt, interpoliereBahn, interpolierePose } from '../engine/pose/interpolation'
+import { bahnBisJetzt, figurPoseZuZeit, interpoliereBahn } from '../engine/pose/interpolation'
 import { COURT, courtLinienOben, seitenAnsicht } from '../engine/pose/court'
 import { alleAnimationen } from '../data/animationen'
 
@@ -29,7 +29,7 @@ function phasenMitten(a: BewegungsAnimation): { t: number; label: string }[] {
 
 /* ---------- Figur-Frame (100×100) ---------- */
 function frontFrame(a: BewegungsAnimation, t: number): string {
-  const pose = interpolierePose(a.posen, t)
+  const pose = figurPoseZuZeit(a.stellungen!, t)
   const teile = frontTeile(pose)
   const shuttle = a.shuttleBahn ? interpoliereBahn(a.shuttleBahn, t) : undefined
   const fx = (z?: number) => FRONT_MITTE + (z ?? 7)
@@ -53,11 +53,11 @@ function frontFrame(a: BewegungsAnimation, t: number): string {
 }
 
 function figurFrame(a: BewegungsAnimation, t: number): string {
-  const pose: Pose = interpolierePose(a.posen, t)
+  const pose: Pose = figurPoseZuZeit(a.stellungen!, t)
   const teile = figurTeile(pose)
   const shuttle = a.shuttleBahn ? interpoliereBahn(a.shuttleBahn, t) : undefined
   const spur = [250, 190, 130, 70].map((d) =>
-    interpolierePose(a.posen, Math.max(0, t - d)).joints.schlaegerKopf,
+    figurPoseZuZeit(a.stellungen!, Math.max(0, t - d)).joints.schlaegerKopf,
   )
   const out: string[] = [
     `<rect width="100" height="100" fill="${F.boden}"/>`,

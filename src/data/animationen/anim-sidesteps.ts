@@ -9,7 +9,6 @@ export const animSidesteps: BewegungsAnimation = {
   dauerMs: 4400,
   beschreibung:
     'Seitliche Bälle werden mit Sidesteps erlaufen: Die Hüfte bleibt zum Netz gerichtet, die Füße kreuzen nie — so bleibt jede Richtung offen.',
-  posen: [],
   spieler: [
     {
       id: 'a',

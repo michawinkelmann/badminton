@@ -2,6 +2,7 @@
  * Phase-2-Abnahme, Teil 2: Alle Filterkombinationen liefern korrekte Treffer.
  */
 import { describe, expect, it } from 'vitest'
+import type { Uebung } from '../datenmodell'
 import { uebungsBibliothek } from '../data/uebungen'
 import { filtereUebungen, trifftFilter } from './uebungsFilter'
 
@@ -43,6 +44,24 @@ describe('Einzelfilter', () => {
     const treffer = filtereUebungen(uebungsBibliothek, { maxDauer: 10 })
     expect(treffer.length).toBeGreaterThan(0)
     expect(treffer.every((u) => u.dauerMin <= 10)).toBe(true)
+  })
+
+  it('Volltextsuche: findet Begriffe aus der ausführlichen Beschreibung', () => {
+    const uebung: Uebung = {
+      id: 'test-beschreibung',
+      name: 'Testübung',
+      kategorie: 'schlagtechnik',
+      skills: ['clear'],
+      niveau: ['anfaenger'],
+      dauerMin: 10,
+      personen: 'paar',
+      material: [],
+      kurzbeschreibung: 'Kurz.',
+      durchfuehrung: ['Schritt eins'],
+      beschreibung: ['Der Spezialbegriff Fledermausgriff steht nur hier.'],
+    }
+    expect(filtereUebungen([uebung], { suche: 'fledermausgriff' })).toHaveLength(1)
+    expect(filtereUebungen([uebung], { suche: 'nicht-enthalten' })).toHaveLength(0)
   })
 
   it('Volltextsuche: findet Namen, Beschreibungen und Schritte, case-insensitiv', () => {

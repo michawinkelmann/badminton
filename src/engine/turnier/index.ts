@@ -184,7 +184,13 @@ export function setzeZwischenstand(
 ): Match[] {
   return turnier.matches.map((m) =>
     m.id === matchId && m.status !== 'beendet'
-      ? { ...m, saetze: saetze.map((s) => ({ ...s })), status: 'laufend' as const }
+      ? {
+          ...m,
+          saetze: saetze.map((s) => ({ ...s })),
+          // Nur mit Feldzuweisung 'laufend' — sonst fiele das Match dauerhaft
+          // aus der Scheduler-Warteschlange (spielbereiteMatches, §9.1).
+          status: m.feld !== undefined ? ('laufend' as const) : ('offen' as const),
+        }
       : m,
   )
 }

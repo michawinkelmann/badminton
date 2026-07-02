@@ -9,10 +9,14 @@
  * 90° = unten, 180° = links, -90° = oben. Figur blickt nach RECHTS.
  * Seitwinkel: + = zur rechten Körperseite hinaus, − = zur linken.
  */
-import type { Pose } from '../../datenmodell'
+import type { Pose, Stellung } from '../../datenmodell'
+
+export type { Stellung } from '../../datenmodell'
 
 export const BODEN_Y = 92
 export const FRONT_MITTE = 50
+/** Front-Fallback-Tiefe für Shuttle/Spur ohne z: Seite des Schlagarms. */
+export const FRONT_SCHLAGSEITE_Z = 7
 
 /** Segmentlängen im 0–100-Raum (Figur ≈ 1,80 m ≈ 72 Einheiten → 1 m ≈ 40). */
 export const SEGMENT = {
@@ -53,30 +57,14 @@ export function winkelPunkt(
   }
 }
 
-/** Eine Körperstellung über Winkel — Seitenebene + optionale Tiefe. */
-export interface Stellung {
-  huefte: { x: number; y: number }
-  rumpf: number // hüfte → schulter (-90 = aufrecht)
-  kopf?: number // nacken → kopf, Default: rumpf-Richtung
-  oberarm: number // schulter → ellbogen
-  unterarm: number // ellbogen → handgelenk
-  schlaeger: number // handgelenk → schlägerkopf
-  obL: number // hüfte → knie links (vom Netz abgewandtes Bein)
-  unL: number // knie → fuß links
-  obR: number // hüfte → knie rechts (netznahes Bein)
-  unR: number // knie → fuß rechts
-  // ---- Tiefe (3D-lite) ----
-  /** 0 = frontal zum Netz, 90 = voll seitlich eingedreht. Default 12. */
-  eindreh?: number
-  oberarmSeit?: number
-  unterarmSeit?: number
-  schlaegerSeit?: number
-  /** Seitwinkel je Bein (beide Segmente). Default: L −4, R +4 (hüftbreit). */
-  beinSeitL?: number
-  beinSeitR?: number
-}
-
-/** Stellung → Pose (11 Gelenke mit x, y, z + Eindreh-Meta). */
+/**
+ * Stellung → Pose (11 Gelenke mit x, y, z + Eindreh-Meta).
+ *
+ * Boden-Verankerung (A3): Der tiefste Fuß steht exakt auf BODEN_Y; die ganze
+ * Figur wird entsprechend verschoben. `huefte.y` wirkt damit relativ (die
+ * Hüfthöhe folgt den Beinwinkeln). Sprünge heben die Figur über
+ * `flugHoehe` explizit vom Boden ab.
+ */
 export function figurPose(t: number, s: Stellung): Pose {
   const schulterXY = winkelPunkt(s.huefte, s.rumpf, SEGMENT.rumpf)
   const nackenXY = winkelPunkt(schulterXY, s.rumpf, SEGMENT.hals * 0.5)
@@ -88,6 +76,16 @@ export function figurPose(t: number, s: Stellung): Pose {
   const fussLXY = winkelPunkt(knieLXY, s.unL, SEGMENT.unterschenkel)
   const knieRXY = winkelPunkt(s.huefte, s.obR, SEGMENT.oberschenkel)
   const fussRXY = winkelPunkt(knieRXY, s.unR, SEGMENT.unterschenkel)
+
+  // Boden-Verankerung: tiefster Fuß auf BODEN_Y minus Flughöhe
+  const dy = BODEN_Y - Math.max(fussLXY.y, fussRXY.y) - (s.flugHoehe ?? 0)
+  for (const p of [
+    schulterXY, nackenXY, kopfXY, ellbogenXY, handgelenkXY, schlaegerKopfXY,
+    knieLXY, fussLXY, knieRXY, fussRXY,
+  ]) {
+    p.y += dy
+  }
+  const huefteXY = { x: s.huefte.x, y: s.huefte.y + dy }
 
   // Tiefe: Arm hängt an der Schlagschulter, Beine an den Hüftseiten
   const eindreh = s.eindreh ?? 12
@@ -113,7 +111,7 @@ export function figurPose(t: number, s: Stellung): Pose {
       ellbogen: { ...ellbogenXY, z: zEllbogen },
       handgelenk: { ...handgelenkXY, z: zHandgelenk },
       schlaegerKopf: { ...schlaegerKopfXY, z: zSchlaegerKopf },
-      huefte: { ...s.huefte, z: 0 },
+      huefte: { ...huefteXY, z: 0 },
       knieL: { ...knieLXY, z: zKnieL },
       fussL: { ...fussLXY, z: zFussL },
       knieR: { ...knieRXY, z: zKnieR },
@@ -139,15 +137,21 @@ export function grundstellung(x = 44): Stellung {
   }
 }
 
-/** Überkopf-Ausholung: voll seitlich, Bogenspannung, Schläger fällt hinter den Rücken. */
+/**
+ * Überkopf-Ausholung: voll seitlich, Bogenspannung, Schläger fällt hinter den Rücken.
+ * Winkel-REPRÄSENTATION bewusst < −180°: unterarm −218° ≡ 142°, schlaeger −255° ≡ 105°.
+ * Die Interpolation lerpt Rohwerte — so fällt der Schläger RÜCKWÄRTS über die
+ * Schulter (vorheriger Keyframe ≈ −60°) und peitscht anschließend ÜBER KOPF
+ * nach vorn zum Treffpunkt (≈ −70°), statt vorn-unten durchzupendeln.
+ */
 export function ausholungUeberkopf(x = 42): Stellung {
   return {
     huefte: { x, y: 58 },
     rumpf: -99,
     kopf: -84,
     oberarm: -135,
-    unterarm: 142,
-    schlaeger: 105,
+    unterarm: -218,
+    schlaeger: -255,
     obL: 96, unL: 80,
     obR: 62, unR: 100,
     eindreh: 78,
@@ -226,7 +230,12 @@ export function hocke(x = 44): Stellung {
 /* ---------- Render-Geometrie: SEITE (React-Player UND Snapshot) ---------- */
 
 export interface FigurTeile {
-  glieder: { x1: number; y1: number; x2: number; y2: number; dick: number; hinten?: boolean }[]
+  glieder: {
+    x1: number; y1: number; x2: number; y2: number; dick: number
+    hinten?: boolean
+    /** Schlagarm (Ober-/Unterarm) — wird im Player hervorgehoben. */
+    arm?: boolean
+  }[]
   gelenke: { x: number; y: number }[]
   kopf: { x: number; y: number; r: number }
   schlaegerLinie: { x1: number; y1: number; x2: number; y2: number }
@@ -240,7 +249,8 @@ export function figurTeile(pose: Pose): FigurTeile {
     b: { x: number; y: number },
     dick: number,
     hinten = false,
-  ) => ({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, dick, hinten })
+    arm = false,
+  ) => ({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, dick, hinten, arm })
 
   const schlaegerWinkel =
     (Math.atan2(j.schlaegerKopf.y - j.handgelenk.y, j.schlaegerKopf.x - j.handgelenk.x) * 180) /
@@ -254,8 +264,8 @@ export function figurTeile(pose: Pose): FigurTeile {
       strich(j.knieR, j.fussR, 2.6),
       strich(j.huefte, j.schulter, 3),
       strich(j.schulter, j.nacken, 3),
-      strich(j.schulter, j.ellbogen, 2.6),
-      strich(j.ellbogen, j.handgelenk, 2.6),
+      strich(j.schulter, j.ellbogen, 2.6, false, true),
+      strich(j.ellbogen, j.handgelenk, 2.6, false, true),
     ],
     gelenke: [j.schulter, j.ellbogen, j.handgelenk, j.huefte, j.knieL, j.knieR],
     kopf: { x: j.kopf.x, y: j.kopf.y, r: SEGMENT.kopfRadius },
@@ -279,7 +289,11 @@ export function figurTeile(pose: Pose): FigurTeile {
 
 export interface FrontTeile {
   /** tiefe = Seiten-x (größer = näher am Netz = näher am Betrachter) */
-  linien: { x1: number; y1: number; x2: number; y2: number; dick: number; tiefe: number }[]
+  linien: {
+    x1: number; y1: number; x2: number; y2: number; dick: number; tiefe: number
+    /** Schlagarm (Ober-/Unterarm) — wird im Player hervorgehoben. */
+    arm?: boolean
+  }[]
   gelenke: { x: number; y: number; tiefe: number }[]
   kopf: { x: number; y: number; r: number; tiefe: number }
   schlaegerLinie: { x1: number; y1: number; x2: number; y2: number; tiefe: number }
@@ -297,7 +311,8 @@ export function frontTeile(pose: Pose): FrontTeile {
     a: { x: number; y: number; z?: number },
     b: { x: number; y: number; z?: number },
     dick: number,
-  ) => ({ x1: fx(a.z), y1: a.y, x2: fx(b.z), y2: b.y, dick, tiefe: (a.x + b.x) / 2 })
+    arm = false,
+  ) => ({ x1: fx(a.z), y1: a.y, x2: fx(b.z), y2: b.y, dick, tiefe: (a.x + b.x) / 2, arm })
 
   const hueftL = { x: j.huefte.x, y: j.huefte.y, z: -zH }
   const hueftR = { x: j.huefte.x, y: j.huefte.y, z: zH }
@@ -320,8 +335,8 @@ export function frontTeile(pose: Pose): FrontTeile {
       linie(j.huefte, j.nacken, 3),
       linie(schulterL, j.schulter, 3),
       // Schlagarm
-      linie(j.schulter, j.ellbogen, 2.6),
-      linie(j.ellbogen, j.handgelenk, 2.6),
+      linie(j.schulter, j.ellbogen, 2.6, true),
+      linie(j.ellbogen, j.handgelenk, 2.6, true),
     ],
     gelenke: [
       { x: fx(j.schulter.z), y: j.schulter.y, tiefe: j.schulter.x },

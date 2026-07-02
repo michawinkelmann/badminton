@@ -8,7 +8,10 @@ import { ALLE_SKILLS, NIVEAU_NAMEN, SKILL_NAMEN } from '../data/skills'
 const BOM = '﻿'
 
 function feld(wert: string | number): string {
-  const text = String(wert)
+  let text = String(wert)
+  // Formel-Injection-Schutz: führende =, +, -, @ neutralisiert Excel als Text.
+  // Reine Zahlen (auch "-3") bleiben unverändert.
+  if (/^[=+\-@]/.test(text) && Number.isNaN(Number(text))) text = `'${text}`
   return /[;"\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text
 }
 

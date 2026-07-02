@@ -169,6 +169,23 @@ export function propagiereSieger(matches: Match[], match: Match): void {
       if (match.bracketSlot! % 2 === 0) platz3.teilnehmerAId = verlierer
       else platz3.teilnehmerBId = verlierer
     }
+    // Freilos-Halbfinale liefern keinen Verlierer (z. B. 3 Teilnehmer): Sind alle
+    // Halbfinals beendet und steht nur EIN Teilnehmer fest, endet Platz 3 als Freilos.
+    if (platz3 && platz3.status === 'offen' && platz3.saetze.length === 0) {
+      const halbfinals = matches.filter(
+        (m) =>
+          m.bracketTyp === 'haupt' && m.phase === match.phase && m.runde === finalRunde - 1,
+      )
+      const a = platz3.teilnehmerAId
+      const b = platz3.teilnehmerBId
+      if (
+        halbfinals.every((m) => m.status === 'beendet') &&
+        (a === undefined) !== (b === undefined)
+      ) {
+        platz3.status = 'beendet'
+        platz3.siegerId = a ?? b
+      }
+    }
   }
 }
 

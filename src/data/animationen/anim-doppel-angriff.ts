@@ -14,7 +14,6 @@ export const animDoppelAngriff: BewegungsAnimation = {
   dauerMs: 7200,
   beschreibung:
     'Solange der Shuttle nach unten geht, spielt das Doppel hintereinander: hinten Druck, vorne töten. Die Rotation hält die Formation am Leben.',
-  posen: [],
   spieler: [
     {
       id: 'a1',

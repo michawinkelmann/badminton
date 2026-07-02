@@ -126,7 +126,26 @@ export default function TurnierNeu() {
 
   /** Doppel/Mixed: Einzelnamen zufällig zu Paaren auslosen (§9.3). */
   function paareAuslosen() {
-    const gemischt = mische(teilnehmer, erzeugeRng())
+    // Bestehende Paare zuerst wieder in Einzelpersonen auflösen — ein zweiter
+    // Klick lost dann komplett neu aus, statt Paare ineinander zu verschachteln.
+    const einzelne: Teilnehmer[] = teilnehmer.flatMap((t) => {
+      const namen = t.name.split(' / ').map((n) => n.trim()).filter(Boolean)
+      if (namen.length <= 1) return [t]
+      const profilIds = t.profilIds ?? []
+      return namen.map((n, i) => ({
+        id: nanoid(8),
+        name: n,
+        ...(profilIds.length === namen.length ? { profilIds: [profilIds[i]!] } : {}),
+      }))
+    })
+    if (einzelne.length % 2 === 1) {
+      // Bei ungerader Anzahl nichts ersetzen — sonst verschwindet still eine Person.
+      setFehler(
+        `Ungerade Anzahl (${einzelne.length}) — für die Paar-Auslosung eine Person entfernen oder eine weitere eintragen. Die Liste wurde nicht verändert.`,
+      )
+      return
+    }
+    const gemischt = mische(einzelne, erzeugeRng())
     const paare: Teilnehmer[] = []
     for (let i = 0; i + 1 < gemischt.length; i += 2) {
       const x = gemischt[i]!
@@ -137,11 +156,7 @@ export default function TurnierNeu() {
         profilIds: [...(x.profilIds ?? []), ...(y.profilIds ?? [])],
       })
     }
-    if (gemischt.length % 2 === 1) {
-      setFehler(`${gemischt.at(-1)!.name} bleibt ohne Partner — Person entfernen oder eine weitere eintragen.`)
-    } else {
-      setFehler(undefined)
-    }
+    setFehler(undefined)
     if (paare.length > 0) setTeilnehmer(paare)
   }
 
@@ -184,6 +199,22 @@ export default function TurnierNeu() {
       !koPhaseMoeglich(config.gruppenAnzahl ?? 2, config.aufsteigerProGruppe ?? 2)
     ) {
       return setFehler('Diese Kombination aus Gruppenzahl und Aufsteigern ergibt keine K.o.-Runde (Gesamtzahl muss 2, 4, 8 … sein).')
+    }
+    if (
+      mitSpielplan &&
+      format === 'gruppen_ko' &&
+      teilnehmer.length < (config.gruppenAnzahl ?? 2) * 2
+    ) {
+      return setFehler(
+        `Für ${config.gruppenAnzahl ?? 2} Gruppen braucht es mindestens ${(config.gruppenAnzahl ?? 2) * 2} Teilnehmer (2 pro Gruppe) — aktuell ${teilnehmer.length}.`,
+      )
+    }
+    // Freie Zählweise klemmen — Zeitspiel (punkteProSatz 0) bleibt erlaubt.
+    if (zaehlweise.modus === 'punkte' && !(zaehlweise.punkteProSatz >= 1)) {
+      return setFehler('Zählweise: „Punkte/Satz" muss mindestens 1 sein.')
+    }
+    if (zaehlweise.modus === 'punkte' && !(zaehlweise.maxPunkte >= zaehlweise.punkteProSatz)) {
+      return setFehler('Zählweise: „Kappung bei" darf nicht kleiner als „Punkte/Satz" sein.')
     }
     const daten = {
       name: name.trim(),

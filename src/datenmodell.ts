@@ -247,6 +247,54 @@ export interface Pose {
   meta?: { eindreh?: number }
 }
 
+/**
+ * Eine Körperstellung über Winkel — Seitenebene + optionale Tiefe (§8.1).
+ * Winkelkonvention (y nach unten): 0° = rechts (zum Netz), 90° = unten,
+ * 180° = links, −90° = oben. Die Geometrie (Stellung → Pose) lebt in
+ * `engine/pose/figur.ts` (`figurPose`).
+ */
+export interface Stellung {
+  huefte: { x: number; y: number }
+  rumpf: number // hüfte → schulter (-90 = aufrecht)
+  kopf?: number // nacken → kopf, Default: rumpf-Richtung
+  oberarm: number // schulter → ellbogen
+  unterarm: number // ellbogen → handgelenk
+  schlaeger: number // handgelenk → schlägerkopf
+  obL: number // hüfte → knie links (vom Netz abgewandtes Bein)
+  unL: number // knie → fuß links
+  obR: number // hüfte → knie rechts (netznahes Bein)
+  unR: number // knie → fuß rechts
+  // ---- Tiefe (3D-lite) ----
+  /** 0 = frontal zum Netz, 90 = voll seitlich eingedreht. Default 12. */
+  eindreh?: number
+  oberarmSeit?: number
+  unterarmSeit?: number
+  schlaegerSeit?: number
+  /** Seitwinkel je Bein (beide Segmente). Default: L −4, R +4 (hüftbreit). */
+  beinSeitL?: number
+  beinSeitR?: number
+  /** Sprunghöhe über dem Boden (0–100-Raum). Default 0 = Füße am Boden. */
+  flugHoehe?: number
+}
+
+/**
+ * Winkel-Keyframe einer Figur-Animation. Zwischen den Keyframes wird pro
+ * Winkelkanal kubisch interpoliert (Catmull-Rom) — Segmentlängen bleiben
+ * dadurch exakt, Schwungbögen entstehen automatisch.
+ */
+export interface FigurKeyframe {
+  t: number
+  /** Bewusster Stopp: Tangente 0 an diesem Keyframe. */
+  halt?: boolean
+  /**
+   * Schlagmoment: Die Tangente übernimmt die schnellere der beiden
+   * Nachbar-Sekanten — der Schläger bremst am Treffpunkt nicht ab,
+   * sondern schwingt mit Anschwung-Tempo durch (A2).
+   */
+  schlag?: boolean
+  s: Stellung
+}
+
 export interface AnimationsPhase {
   vonT: number
   bisT: number
@@ -290,7 +338,10 @@ export interface BewegungsAnimation {
   name: string
   typ: 'figur' | 'court' | 'kombi'
   dauerMs: number
-  posen: Pose[]
+  /** Nur typ 'figur': Winkel-Keyframes; Posen entstehen pro Frame via figurPose. */
+  stellungen?: FigurKeyframe[]
+  /** Schlagmoment in ms (Impact-Marker im Player, Konsistenztests). */
+  kontaktT?: number
   phasen: AnimationsPhase[]
   shuttleBahn?: BahnPunkt[] // Bézier-gesampelt
   // ---- Erweiterungen (Modell darf erweitert werden, §3) ----

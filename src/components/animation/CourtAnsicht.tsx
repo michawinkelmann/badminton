@@ -54,10 +54,10 @@ function ObenAnsicht({ animation, t, modus }: Props) {
       {/* Netz */}
       <line x1={COURT.netzX * S} y1={-6} x2={COURT.netzX * S} y2={COURT.breite * S + 6} stroke="var(--color-tinte)" strokeWidth={3} strokeDasharray="6 4" />
 
-      {/* Laufwege + Spieler */}
+      {/* Laufwege + Spieler (Läufer mit Smoothstep-Easing pro Bahnsegment, A6) */}
       {(animation.spieler ?? []).map((sp) => {
-        const weg = bahnBisJetzt(sp.bahn, t)
-        const pos = interpoliereBahn(sp.bahn, Math.max(t, sp.bahn[0]?.t ?? 0)) ?? sp.bahn[0]
+        const weg = bahnBisJetzt(sp.bahn, t, 'smooth')
+        const pos = interpoliereBahn(sp.bahn, Math.max(t, sp.bahn[0]?.t ?? 0), 'smooth') ?? sp.bahn[0]
         const farbe = sp.seite === 'a' ? 'var(--color-signal)' : 'var(--color-linie)'
         return (
           <g key={sp.id}>
@@ -108,7 +108,7 @@ function SeitenAnsichtSvg({ animation, t }: { animation: BewegungsAnimation; t: 
 
       {/* Spieler als Punkte am Boden */}
       {(animation.spieler ?? []).map((sp) => {
-        const pos = interpoliereBahn(sp.bahn, Math.max(t, sp.bahn[0]?.t ?? 0)) ?? sp.bahn[0]
+        const pos = interpoliereBahn(sp.bahn, Math.max(t, sp.bahn[0]?.t ?? 0), 'smooth') ?? sp.bahn[0]
         if (!pos) return null
         return (
           <g key={sp.id}>

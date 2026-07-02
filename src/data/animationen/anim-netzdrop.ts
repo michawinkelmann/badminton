@@ -1,6 +1,6 @@
 /** Animation 9: Netzdrop Vorhand — früher, hoher Treffpunkt, eng über die Kante. */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { ausfallschritt, figurPose, grundstellung, hocke } from '../../engine/pose/figur'
+import { ausfallschritt, grundstellung, hocke } from '../../engine/pose/figur'
 import { bezierBahn } from '../../engine/pose/interpolation'
 
 export const animNetzdrop: BewegungsAnimation = {
@@ -8,39 +8,40 @@ export const animNetzdrop: BewegungsAnimation = {
   name: 'Netzdrop Vorhand',
   typ: 'figur',
   dauerMs: 2600,
+  kontaktT: 1410,
   netzX: 82,
   beschreibung:
     'Vom T-Punkt ans Netz: Je früher und höher der Treffpunkt, desto enger lässt sich der Shuttle über die Kante legen.',
-  posen: [
-    figurPose(0, grundstellung(30)),
-    figurPose(400, hocke(31)),
+  stellungen: [
+    { t: 0, s: grundstellung(30) },
+    { t: 400, s: hocke(31) },
     // Weg nach vorn, Schläger hebt schon im Lauf
-    figurPose(900, {
+    { t: 900, s: {
       huefte: { x: 44, y: 60 },
       rumpf: -80,
       oberarm: 12, unterarm: -22, schlaeger: -18,
       eindreh: 16, oberarmSeit: 8,
       obL: 116, unL: 96, obR: 48, unR: 92,
-    }),
+    } },
     // Ausfallschritt: Arm weit vorgestreckt, Treffpunkt nahe Kantenhöhe
-    figurPose(1400, {
+    { t: 1400, schlag: true, s: {
       ...ausfallschritt(49, 0),
       oberarm: 57, unterarm: -63, schlaeger: -50,
-    }),
+    } },
     // zartes Nachgeben des Handgelenks
-    figurPose(1650, {
+    { t: 1650, s: {
       ...ausfallschritt(49, 0),
       oberarm: 57, unterarm: -58, schlaeger: -34,
-    }),
+    } },
     // rückwärts lösen
-    figurPose(2100, {
+    { t: 2100, s: {
       huefte: { x: 46, y: 60 },
       rumpf: -84,
       oberarm: 28, unterarm: -30, schlaeger: -30,
       eindreh: 12, oberarmSeit: 6,
       obL: 114, unL: 94, obR: 52, unR: 96,
-    }),
-    figurPose(2600, grundstellung(30)),
+    } },
+    { t: 2600, s: grundstellung(30) },
   ],
   phasen: [
     {
@@ -65,7 +66,7 @@ export const animNetzdrop: BewegungsAnimation = {
     },
   ],
   shuttleBahn: [
-    ...bezierBahn({ x: 94, y: 20 }, { x: 85, y: 24 }, { x: 73, y: 31.5 }, 1000, 1390, 8, { von: 4, bis: 8 }),
-    ...bezierBahn({ x: 73, y: 31.5 }, { x: 79, y: 22 }, { x: 86, y: 36 }, 1430, 1950, 8, { von: 8, bis: 6 }),
+    ...bezierBahn({ x: 94, y: 20 }, { x: 84.85, y: 24.86 }, { x: 72.71, y: 39.17 }, 1000, 1410, 8, { von: 4, bis: 8 }),
+    ...bezierBahn( { x: 72.71, y: 39.17 }, { x: 78.85, y: 18.95 }, { x: 86, y: 36 }, 1410, 1950, 8, { von: 8, bis: 6 }),
   ],
 }

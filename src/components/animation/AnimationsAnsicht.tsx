@@ -1,6 +1,11 @@
-import { useState } from 'react'
-import type { BewegungsAnimation } from '../../datenmodell'
-import { interpolierePose, interpoliereBahn } from '../../engine/pose/interpolation'
+import { useMemo, useState } from 'react'
+import type { BewegungsAnimation, Pose } from '../../datenmodell'
+import {
+  figurPoseZuZeit,
+  fussAufsetzer,
+  interpoliereBahn,
+} from '../../engine/pose/interpolation'
+import { figurPose } from '../../engine/pose/figur'
 import { usePosePlayer, type Tempo } from '../../engine/pose/player'
 import FigurAnsicht from './FigurAnsicht'
 import CourtAnsicht from './CourtAnsicht'
@@ -11,30 +16,80 @@ interface Props {
 }
 
 const TEMPI: Tempo[] = [0.25, 0.5, 1]
+/** Zeitversätze der Bewegungsspuren (alt → neu). */
+const SPUR_OFFSETS = [250, 190, 130, 70]
+const SHUTTLE_SPUR_OFFSETS = [200, 160, 120, 80, 40]
+/** Sichtbarkeitsdauer des Fuß-Aufsetz-Rings. */
+const AUFSETZ_RING_MS = 260
 
 /**
  * Kompletter Player (§8.1): Figur- oder Court-Ansicht plus Controls
  * (Play/Pause, Zeitlupe, Phasen-Stepper, Scrubber) und Phasen-Lehrtext.
  */
 export default function AnimationsAnsicht({ animation, kompakt = false }: Props) {
-  const player = usePosePlayer(animation.dauerMs, animation.phasen)
+  const istFigur = animation.typ === 'figur' && (animation.stellungen?.length ?? 0) > 0
+  const [zeitlupe, setZeitlupe] = useState(true)
+  const player = usePosePlayer(
+    animation.dauerMs,
+    animation.phasen,
+    zeitlupe && istFigur ? animation.kontaktT : undefined,
+  )
   const [modus, setModus] = useState<'einzel' | 'doppel'>('einzel')
   const phase = animation.phasen[player.aktivePhase]
 
-  const istFigur = animation.typ === 'figur'
-  const pose = istFigur ? interpolierePose(animation.posen, player.t) : undefined
-  // Spur des Schlägerkopfs über die letzten ~250 ms (alt → neu)
-  const spur = istFigur
-    ? [250, 190, 130, 70].map(
-        (d) =>
-          interpolierePose(animation.posen, Math.max(0, player.t - d)).joints
-            .schlaegerKopf,
-      )
+  const pose = istFigur ? figurPoseZuZeit(animation.stellungen!, player.t) : undefined
+  // Bewegungsspuren über die letzten ~250 ms (alt → neu)
+  const spurPosen = istFigur
+    ? SPUR_OFFSETS.map((d) => figurPoseZuZeit(animation.stellungen!, Math.max(0, player.t - d)))
     : undefined
+  const spur = spurPosen?.map((p) => p.joints.schlaegerKopf)
+  // Fußspuren nur bei Footwork (Animationen ohne Schlagmoment)
+  const istFootwork = istFigur && animation.kontaktT === undefined
+  const fussSpurL = istFootwork ? spurPosen!.map((p) => p.joints.fussL) : undefined
+  const fussSpurR = istFootwork ? spurPosen!.map((p) => p.joints.fussR) : undefined
+
   const shuttle =
     istFigur && animation.shuttleBahn
       ? interpoliereBahn(animation.shuttleBahn, player.t)
       : undefined
+  // Shuttle-Schweif (alt → neu), nur wo die Bahn existiert
+  const shuttleSpur =
+    istFigur && animation.shuttleBahn
+      ? SHUTTLE_SPUR_OFFSETS.flatMap((d) => {
+          const p = interpoliereBahn(animation.shuttleBahn!, player.t - d)
+          return p ? [p] : []
+        })
+      : undefined
+
+  // Impact-Ring am Schlägerkopf im Kontakt-Fenster (±70 ms um kontaktT)
+  const impact =
+    istFigur &&
+    animation.kontaktT !== undefined &&
+    Math.abs(player.t - animation.kontaktT) < 70
+      ? (player.t - animation.kontaktT + 70) / 140
+      : undefined
+
+  // Fuß-Aufsetzer (einmal pro Animation berechnet): Puls-Ringe beim Landen
+  const aufsetzZeiten = useMemo(() => {
+    if (!istFigur) return []
+    return fussAufsetzer(animation.stellungen!).map((a) => {
+      const j = figurPoseZuZeit(animation.stellungen!, a.t).joints
+      const f = a.fuss === 'L' ? j.fussL : j.fussR
+      return { t: a.t, x: f.x, y: f.y, z: f.z }
+    })
+  }, [animation, istFigur])
+  const aufsetzer = aufsetzZeiten
+    .filter((a) => player.t - a.t >= 0 && player.t - a.t < AUFSETZ_RING_MS)
+    .map((a) => ({ x: a.x, y: a.y, z: a.z, progress: (player.t - a.t) / AUFSETZ_RING_MS }))
+
+  // Onion-Skin im Pausen-/Stepper-Modus: Nachbar-Keyframes als Geister
+  let geister: Pose[] | undefined
+  if (istFigur && !player.laeuft) {
+    const kf = animation.stellungen!
+    const vor = [...kf].reverse().find((k) => k.t < player.t - 1)
+    const nach = kf.find((k) => k.t > player.t + 1)
+    geister = [vor, nach].flatMap((k) => (k ? [figurPose(k.t, k.s)] : []))
+  }
 
   return (
     <div className="rounded-xl border-2 border-court/30 bg-linie">
@@ -43,13 +98,37 @@ export default function AnimationsAnsicht({ animation, kompakt = false }: Props)
         <div className="grid grid-cols-1 gap-px bg-court/20 sm:grid-cols-2">
           <div>
             <div className="aspect-square w-full bg-boden">
-              <FigurAnsicht pose={pose} shuttle={shuttle} netzX={animation.netzX} spur={spur} ansicht="seite" />
+              <FigurAnsicht
+                pose={pose}
+                shuttle={shuttle}
+                netzX={animation.netzX}
+                spur={spur}
+                ansicht="seite"
+                impact={impact}
+                shuttleSpur={shuttleSpur}
+                fussSpurL={fussSpurL}
+                fussSpurR={fussSpurR}
+                aufsetzer={aufsetzer}
+                geister={geister}
+              />
             </div>
             <p className="bg-boden pb-1 text-center text-xs font-semibold text-tinte/55">Seite</p>
           </div>
           <div>
             <div className="aspect-square w-full bg-boden">
-              <FigurAnsicht pose={pose} shuttle={shuttle} netzX={animation.netzX} spur={spur} ansicht="front" />
+              <FigurAnsicht
+                pose={pose}
+                shuttle={shuttle}
+                netzX={animation.netzX}
+                spur={spur}
+                ansicht="front"
+                impact={impact}
+                shuttleSpur={shuttleSpur}
+                fussSpurL={fussSpurL}
+                fussSpurR={fussSpurR}
+                aufsetzer={aufsetzer}
+                geister={geister}
+              />
             </div>
             <p className="bg-boden pb-1 text-center text-xs font-semibold text-tinte/55">Front — wie im Spiegel</p>
           </div>
@@ -105,6 +184,20 @@ export default function AnimationsAnsicht({ animation, kompakt = false }: Props)
             </button>
           ))}
         </div>
+
+        {istFigur && animation.kontaktT !== undefined && (
+          <button
+            type="button"
+            onClick={() => setZeitlupe((z) => !z)}
+            aria-pressed={zeitlupe}
+            title="Automatische Zeitlupe rund um den Treffpunkt"
+            className={`min-h-11 rounded-md border-2 px-3 text-xs font-semibold ${
+              zeitlupe ? 'border-court bg-court text-linie' : 'border-court/40 text-tinte/70 hover:border-court'
+            }`}
+          >
+            Zeitlupe Treffpunkt
+          </button>
+        )}
 
         <div className="flex overflow-hidden rounded-md border-2 border-court/40" role="group" aria-label="Phasen-Stepper">
           <button type="button" onClick={player.vorherigePhase} aria-label="Vorherige Phase" className="min-h-11 px-3 font-bold text-tinte/80 hover:bg-boden">

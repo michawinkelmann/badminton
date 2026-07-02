@@ -10,7 +10,6 @@ export const animFlugbahnen: BewegungsAnimation = {
   dauerMs: 6600,
   beschreibung:
     'Vier Grundschläge, vier Flugkurven: Höhe, Länge und Tempo entscheiden, wie viel Zeit der Gegner bekommt — und wie viel Risiko im Schlag steckt.',
-  posen: [],
   spieler: [
     { id: 'a', label: 'A', seite: 'a', bahn: [{ t: 0, x: 1.6, y: 0 }, { t: 6600, x: 1.6, y: 0 }] },
     { id: 'b', label: 'B', seite: 'b', bahn: [{ t: 0, x: 10.2, y: 0 }, { t: 6600, x: 10.2, y: 0 }] },

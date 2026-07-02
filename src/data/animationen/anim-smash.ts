@@ -1,6 +1,6 @@
 /** Animation 3: Smash — Treffpunkt deutlich vor dem Körper, Fläche schlägt abwärts. */
 import type { BewegungsAnimation } from '../../datenmodell'
-import { ausholungUeberkopf, figurPose, grundstellung, treffpunktHoch } from '../../engine/pose/figur'
+import { ausholungUeberkopf, grundstellung, treffpunktHoch } from '../../engine/pose/figur'
 import { bezierBahn } from '../../engine/pose/interpolation'
 
 export const animSmash: BewegungsAnimation = {
@@ -8,28 +8,29 @@ export const animSmash: BewegungsAnimation = {
   name: 'Smash',
   typ: 'figur',
   dauerMs: 2600,
+  kontaktT: 1400,
   beschreibung:
     'Der Punktschlag: gleiche Kette wie beim Clear, aber der Treffpunkt liegt weiter vorn — die Schlagfläche zeigt im Treffmoment schräg nach unten.',
-  posen: [
-    figurPose(0, grundstellung(44)),
-    figurPose(650, {
+  stellungen: [
+    { t: 0, s: grundstellung(44) },
+    { t: 650, s: {
       huefte: { x: 43, y: 58 },
       rumpf: -96,
       oberarm: -128, unterarm: -68, schlaeger: -58,
       obL: 97, unL: 82, obR: 68, unR: 99,
       eindreh: 72, oberarmSeit: 4,
-    }),
-    figurPose(1250, ausholungUeberkopf(42)),
-    figurPose(1400, treffpunktHoch(46, -66)),
+    } },
+    { t: 1250, s: ausholungUeberkopf(42) },
+    { t: 1400, schlag: true, s: treffpunktHoch(46, -66) },
     // steiler Durchschwung nach vorn-unten
-    figurPose(1800, {
+    { t: 1800, s: {
       huefte: { x: 48, y: 57 },
       rumpf: -82,
       oberarm: 22, unterarm: 62, schlaeger: 86,
       eindreh: 10, oberarmSeit: 8,
       obL: 110, unL: 88, obR: 62, unR: 92,
-    }),
-    figurPose(2600, grundstellung(45)),
+    } },
+    { t: 2600, s: grundstellung(45) },
   ],
   phasen: [
     {
@@ -54,7 +55,7 @@ export const animSmash: BewegungsAnimation = {
     },
   ],
   shuttleBahn: [
-    ...bezierBahn({ x: 98, y: 18 }, { x: 78, y: 0 }, { x: 62, y: 8 }, 600, 1380, 10, { von: 4, bis: 9 }),
-    ...bezierBahn({ x: 62, y: 8 }, { x: 74, y: 32 }, { x: 92, y: 82 }, 1420, 1750, 10, { von: 9, bis: 3 }),
+    ...bezierBahn({ x: 98, y: 18 }, { x: 78.78, y: 3.26 }, { x: 63.55, y: 14.53 }, 600, 1400, 10, { von: 4, bis: 9 }),
+    ...bezierBahn( { x: 63.55, y: 14.53 }, { x: 74.78, y: 35.27 }, { x: 92, y: 82 }, 1400, 1750, 10, { von: 9, bis: 3 }),
   ],
 }

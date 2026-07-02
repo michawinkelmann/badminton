@@ -7,7 +7,7 @@ import type { Match, Teilnehmer, Zaehlweise } from '../../datenmodell'
 import { mische, type Rng } from './rng'
 import { erzeugeRoundRobinMatches } from './roundRobin'
 import { berechneTabelle } from './tabelle'
-import { erzeugeKoMatches } from './ko'
+import { erzeugeKoMatches, naechsteZweierpotenz } from './ko'
 
 export const GRUPPEN_NAMEN = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 
@@ -59,20 +59,52 @@ export function gruppenphaseFertig(matches: Match[]): boolean {
  * Kreuz-Slots für die K.o.-Phase: A1–B2, B1–A2 (2 Gruppen) bzw.
  * A1–B2, C1–D2, B1–A2, D1–C2 (4 Gruppen) — Erst- und Zweitplatzierte einer
  * Gruppe landen in entgegengesetzten Bracket-Hälften.
+ * Defensiv gegen unterbesetzte/fehlende Gruppen (z. B. Einer-Gruppen): leere
+ * Slots werden mit den nächstbesten vorhandenen Aufsteigern gefüllt, der Rest
+ * wird Freilos — statt eines Crashs beim K.o.-Start.
  */
-export function kreuzSlots(aufsteigerProGruppe: number, tabellenProGruppe: string[][]): string[] {
+export function kreuzSlots(
+  aufsteigerProGruppe: number,
+  tabellenProGruppe: string[][],
+): (string | undefined)[] {
   const k = tabellenProGruppe.length
-  const slots: string[] = []
+  const wunsch: (string | undefined)[] = []
   if (aufsteigerProGruppe === 1) {
-    for (const t of tabellenProGruppe) slots.push(t[0]!)
-    return slots
+    for (const t of tabellenProGruppe) wunsch.push(t[0])
+  } else {
+    // Standard: 2 Aufsteiger — Paare (G_i 1. vs G_partner 2.)
+    for (let i = 0; i < k; i += 2) {
+      wunsch.push(tabellenProGruppe[i]?.[0], tabellenProGruppe[i + 1]?.[1])
+    }
+    for (let i = 0; i < k; i += 2) {
+      wunsch.push(tabellenProGruppe[i + 1]?.[0], tabellenProGruppe[i]?.[1])
+    }
   }
-  // Standard: 2 Aufsteiger — Paare (G_i 1. vs G_partner 2.)
-  for (let i = 0; i < k; i += 2) {
-    slots.push(tabellenProGruppe[i]![0]!, tabellenProGruppe[i + 1]![1]!)
+
+  // Leere Wunsch-Slots mit den nächstbesten noch nicht platzierten Aufsteigern füllen
+  const reserve: string[] = []
+  for (let platz = 0; platz < aufsteigerProGruppe; platz++) {
+    for (const t of tabellenProGruppe) {
+      const id = t[platz]
+      if (id !== undefined) reserve.push(id)
+    }
   }
-  for (let i = 0; i < k; i += 2) {
-    slots.push(tabellenProGruppe[i + 1]![0]!, tabellenProGruppe[i]![1]!)
+  const benutzt = new Set(wunsch.filter((s): s is string => s !== undefined))
+  const uebrig = reserve.filter((id) => !benutzt.has(id))
+  const slots = wunsch.map((s) => s ?? uebrig.shift())
+
+  // Auf Zweierpotenz auffüllen und doppelte Freilos-Paare auflösen, damit kein
+  // Erstrunden-Match ganz ohne Teilnehmer zurückbleibt.
+  const ziel = naechsteZweierpotenz(Math.max(2, slots.length))
+  while (slots.length < ziel) slots.push(undefined)
+  for (let p = 0; 2 * p + 1 < slots.length; p++) {
+    if (slots[2 * p] !== undefined || slots[2 * p + 1] !== undefined) continue
+    const spender = Array.from({ length: slots.length / 2 }, (_, q) => q).find(
+      (q) => slots[2 * q] !== undefined && slots[2 * q + 1] !== undefined,
+    )
+    if (spender === undefined) break
+    slots[2 * p] = slots[2 * spender + 1]
+    slots[2 * spender + 1] = undefined
   }
   return slots
 }

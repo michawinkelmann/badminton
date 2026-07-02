@@ -25,6 +25,11 @@ describe('Satz-Endstände (offiziell 21, Verlängerung, Kappung 30)', () => {
   it('über maxPunkte ist ungültig', () => {
     expect(satzSieger({ a: 31, b: 29 }, offiziell)).toBeUndefined()
   })
+  it('Kappungs-Endstand nur mit 1–2 Punkten Abstand (30:28 ja, 30:22 nein)', () => {
+    expect(satzSieger({ a: 30, b: 28 }, offiziell)).toBe('a')
+    expect(satzSieger({ a: 30, b: 22 }, offiziell)).toBeUndefined()
+    expect(satzSieger({ a: 30, b: 0 }, offiziell)).toBeUndefined()
+  })
   it('ohne Verlängerung endet der Satz exakt bei punkteProSatz', () => {
     const ohne: Zaehlweise = { ...offiziell, verlaengerung: false, punkteProSatz: 15 }
     expect(satzSieger({ a: 15, b: 14 }, ohne)).toBe('a')

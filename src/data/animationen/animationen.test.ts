@@ -3,6 +3,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { ALLE_JOINTS } from '../../engine/pose/interpolation'
+import { figurPose } from '../../engine/pose/figur'
 import { uebungsBibliothek } from '../uebungen'
 import { alleAnimationen, animationsGruppen, findeAnimation } from './index'
 
@@ -53,14 +54,17 @@ describe('Jede Animation ist vollständig und abspielbar', () => {
       }
 
       if (a.typ === 'figur') {
-        // Posen: sortiert, decken 0..dauerMs ab, alle 11 Gelenke im 0–100-Raum
-        expect(a.posen.length).toBeGreaterThanOrEqual(4)
-        expect(a.posen[0]!.t).toBe(0)
-        expect(a.posen[a.posen.length - 1]!.t).toBe(a.dauerMs)
-        for (let i = 1; i < a.posen.length; i++) {
-          expect(a.posen[i]!.t).toBeGreaterThan(a.posen[i - 1]!.t)
+        // Keyframes: sortiert, decken 0..dauerMs ab, gebacken alle 11 Gelenke im 0–100-Raum
+        const kf = a.stellungen!
+        expect(kf, `${a.id}: stellungen fehlen`).toBeDefined()
+        expect(kf.length).toBeGreaterThanOrEqual(4)
+        expect(kf[0]!.t).toBe(0)
+        expect(kf[kf.length - 1]!.t).toBe(a.dauerMs)
+        for (let i = 1; i < kf.length; i++) {
+          expect(kf[i]!.t).toBeGreaterThan(kf[i - 1]!.t)
         }
-        for (const pose of a.posen) {
+        for (const k of kf) {
+          const pose = figurPose(k.t, k.s)
           for (const j of ALLE_JOINTS) {
             const punkt = pose.joints[j]
             expect(punkt, `${a.id}: Gelenk ${j}`).toBeDefined()

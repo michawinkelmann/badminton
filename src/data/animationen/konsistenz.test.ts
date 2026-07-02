@@ -7,46 +7,43 @@
  */
 import { describe, expect, it } from 'vitest'
 import type { BewegungsAnimation } from '../../datenmodell'
-import { BODEN_Y } from '../../engine/pose/figur'
+import { BODEN_Y, FRONT_SCHLAGSEITE_Z, figurPose } from '../../engine/pose/figur'
 import { COURT } from '../../engine/pose/court'
-import { interpoliereBahn, interpolierePose } from '../../engine/pose/interpolation'
+import { figurPoseZuZeit, interpoliereBahn } from '../../engine/pose/interpolation'
 import { alleAnimationen, findeAnimation } from './index'
 
 const NETZKANTE_Y = BODEN_Y - 1.55 * 40 // = 30 im 0–100-Raum
 
-/** Kontaktzeitpunkte der Figur-Animationen (Schlagmoment). */
-const KONTAKTE: Record<string, number> = {
-  'anim-clear': 1450,
-  'anim-drop': 1480,
-  'anim-smash': 1400,
-  'anim-sprungsmash': 1300,
-  'anim-rh-clear': 1500,
-  'anim-drive-vh': 800,
-  'anim-drive-rh': 800,
-  'anim-unterhand-clear': 1400,
-  'anim-netzdrop': 1410,
-  'anim-netzlob-rh': 1420,
-  'anim-aufschlag-kurz': 1150,
-  'anim-aufschlag-lang': 1300,
-  'anim-netzkill': 790,
-  'anim-block': 950,
-}
+/** Schlag-Animationen tragen ihren Kontaktzeitpunkt im Datenmodell (kontaktT). */
+const schlaege = alleAnimationen.filter(
+  (a): a is BewegungsAnimation & { kontaktT: number } => a.kontaktT !== undefined,
+)
 
 function abstand(a: { x: number; y: number }, b: { x: number; y: number }): number {
   return Math.hypot(a.x - b.x, a.y - b.y)
 }
 
 describe('Treffpunkt = Schlägerkopf', () => {
-  for (const [id, kontaktT] of Object.entries(KONTAKTE)) {
-    it(`${id}: Shuttle ist beim Kontakt (t=${kontaktT}) am Schlägerkopf`, () => {
-      const a = findeAnimation(id)!
-      const shuttle = interpoliereBahn(a.shuttleBahn!, kontaktT)
+  it('alle 14 Schlag-Animationen tragen ein kontaktT', () => {
+    expect(schlaege.map((a) => a.id).sort()).toEqual(
+      [
+        'anim-aufschlag-kurz', 'anim-aufschlag-lang', 'anim-block', 'anim-clear',
+        'anim-drive-rh', 'anim-drive-vh', 'anim-drop', 'anim-netzdrop',
+        'anim-netzkill', 'anim-netzlob-rh', 'anim-rh-clear', 'anim-smash',
+        'anim-sprungsmash', 'anim-unterhand-clear',
+      ],
+    )
+  })
+
+  for (const a of schlaege) {
+    it(`${a.id}: Shuttle ist beim Kontakt (t=${a.kontaktT}) am Schlägerkopf`, () => {
+      const shuttle = interpoliereBahn(a.shuttleBahn!, a.kontaktT)
       expect(shuttle, 'Shuttle muss zum Kontaktzeitpunkt sichtbar sein').toBeDefined()
-      const tip = interpolierePose(a.posen, kontaktT).joints.schlaegerKopf
+      const tip = figurPoseZuZeit(a.stellungen!, a.kontaktT).joints.schlaegerKopf
       expect(
         abstand(tip, shuttle!),
         `Abstand Schlägerkopf↔Shuttle: ${abstand(tip, shuttle!).toFixed(1)}`,
-      ).toBeLessThan(8)
+      ).toBeLessThan(3)
     })
   }
 })
@@ -175,7 +172,8 @@ describe('3D-lite: Tiefe konsistent', () => {
 
   for (const a of figuren) {
     it(`${a.id}: z-Werte im Rahmen, Eindrehen 0–90°`, () => {
-      for (const pose of a.posen) {
+      for (const k of a.stellungen!) {
+        const pose = figurPose(k.t, k.s)
         expect(pose.meta?.eindreh ?? 12).toBeGreaterThanOrEqual(0)
         expect(pose.meta?.eindreh ?? 12).toBeLessThanOrEqual(90)
         for (const j of Object.values(pose.joints)) {
@@ -186,12 +184,11 @@ describe('3D-lite: Tiefe konsistent', () => {
   }
 
   it('Frontansicht: Shuttle ist beim Kontakt seitlich am Schlägerkopf', () => {
-    for (const [id, kontaktT] of Object.entries(KONTAKTE)) {
-      const a = findeAnimation(id)!
-      const shuttle = interpoliereBahn(a.shuttleBahn!, kontaktT)!
-      const tip = interpolierePose(a.posen, kontaktT).joints.schlaegerKopf
-      const dz = Math.abs((tip.z ?? 0) - (shuttle.z ?? 7))
-      expect(dz, `${id}: |z-Differenz| = ${dz.toFixed(1)}`).toBeLessThan(5)
+    for (const a of schlaege) {
+      const shuttle = interpoliereBahn(a.shuttleBahn!, a.kontaktT)!
+      const tip = figurPoseZuZeit(a.stellungen!, a.kontaktT).joints.schlaegerKopf
+      const dz = Math.abs((tip.z ?? 0) - (shuttle.z ?? FRONT_SCHLAGSEITE_Z))
+      expect(dz, `${a.id}: |z-Differenz| = ${dz.toFixed(1)}`).toBeLessThan(5)
     }
   })
 })

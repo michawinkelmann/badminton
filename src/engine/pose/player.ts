@@ -33,9 +33,17 @@ export function bevorzugtReduzierteBewegung(): boolean {
   )
 }
 
+/** Kurze Pause auf der Endpose, bevor der Loop neu beginnt (lesbarer Zyklus). */
+const END_HOLD_MS = 400
+/** Auto-Zeitlupe: Fenster um den Schlagmoment und Verlangsamungsfaktor. */
+const ZEITLUPE_FENSTER_MS = 200
+const ZEITLUPE_FAKTOR = 0.25
+
 export function usePosePlayer(
   dauerMs: number,
   phasen: AnimationsPhase[],
+  /** Automatische Zeitlupe ±200 ms um diesen Zeitpunkt (z. B. kontaktT). */
+  zeitlupeUm?: number,
 ): PosePlayerApi {
   const reduziert = useMemo(bevorzugtReduzierteBewegung, [])
   const [t, setT] = useState(0)
@@ -43,15 +51,24 @@ export function usePosePlayer(
   const [tempo, setTempo] = useState<Tempo>(1)
   const tRef = useRef(0)
   tRef.current = t
+  const zeitlupeRef = useRef(zeitlupeUm)
+  zeitlupeRef.current = zeitlupeUm
 
   useEffect(() => {
     if (!laeuft) return
     let rahmen = 0
     let zuletzt = performance.now()
+    // Roh-Position läuft über dauerMs hinaus weiter (End-Hold), t wird gekappt
+    let roh = tRef.current
+    const zyklus = dauerMs + END_HOLD_MS
     const schritt = (jetzt: number) => {
       const delta = Math.min(100, jetzt - zuletzt)
       zuletzt = jetzt
-      const neu = (tRef.current + delta * tempo) % dauerMs
+      const zl = zeitlupeRef.current
+      const faktor =
+        zl !== undefined && Math.abs(roh - zl) <= ZEITLUPE_FENSTER_MS ? ZEITLUPE_FAKTOR : 1
+      roh = (roh + delta * tempo * faktor) % zyklus
+      const neu = Math.min(roh, dauerMs)
       tRef.current = neu
       setT(neu)
       rahmen = requestAnimationFrame(schritt)

@@ -35,6 +35,7 @@ export default function BestaetigungsDialog({
   return (
     <dialog
       ref={ref}
+      aria-label={titel}
       onClose={onAbbrechen}
       onCancel={onAbbrechen}
       className="m-auto w-full max-w-md rounded-xl border-2 border-court bg-linie p-0 text-tinte shadow-xl backdrop:bg-tinte/50"
